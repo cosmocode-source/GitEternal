@@ -1,0 +1,125 @@
+name: "02 · Generate Statistics & Deploy Pages"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Reads git-eternal-data, generates analytics reports and a GitHub Pages
+# dashboard, then pushes everything to git-statistics.
+#
+# Triggered automatically after a successful harvest, or manually.
+#
+# Required secrets:
+#   GIT_ETERNAL_DATA_TOKEN  — fine-grained PAT, contents:read on git-eternal-data
+#   GIT_ETERNAL_DATA_REPO   — owner/git-eternal-data
+#   GIT_STATISTICS_TOKEN    — fine-grained PAT, contents:write on git-statistics
+#   GIT_STATISTICS_REPO     — owner/git-statistics
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  workflow_run:
+    workflows: ["01 · Harvest Traffic Data"]
+    types: [completed]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  statistics:
+    # Only run if the harvester succeeded (or if manually dispatched)
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: pip install -r packages/engine/requirements.txt
+
+      - name: Configure git identity
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Clone git-eternal-data (read-only)
+        env:
+          DATA_TOKEN: ${{ secrets.GIT_ETERNAL_DATA_TOKEN }}
+          DATA_REPO:  ${{ secrets.GIT_ETERNAL_DATA_REPO }}
+        run: |
+          git clone \
+            --branch git-eternal-data \
+            --depth 1 \
+            "https://x-access-token:${DATA_TOKEN}@github.com/${DATA_REPO}.git" \
+            /tmp/vault
+          echo "✅  Cloned vault: $(ls /tmp/vault)"
+
+      - name: Generate statistics reports + HTML
+        env:
+          GIT_STATISTICS_REPO: ${{ secrets.GIT_STATISTICS_REPO }}
+        run: |
+          python -m packages.engine.statistics \
+            --vault  /tmp/vault \
+            --output /tmp/stats-output
+          echo "✅  Generated output:"
+          ls -lh /tmp/stats-output/
+
+      - name: Clone git-statistics (write)
+        env:
+          STATS_TOKEN: ${{ secrets.GIT_STATISTICS_TOKEN }}
+          STATS_REPO:  ${{ secrets.GIT_STATISTICS_REPO }}
+        run: |
+          git clone \
+            --branch main \
+            --depth 1 \
+            "https://x-access-token:${STATS_TOKEN}@github.com/${STATS_REPO}.git" \
+            /tmp/git-statistics
+
+      - name: Copy reports and dashboard into git-statistics
+        run: |
+          # Reports (JSON) — consumed by dashboard JS
+          mkdir -p /tmp/git-statistics/reports
+          cp /tmp/stats-output/reports/*.json /tmp/git-statistics/reports/
+
+          # Dashboard HTML
+          mkdir -p /tmp/git-statistics/docs
+          cp /tmp/stats-output/docs/index.html /tmp/git-statistics/docs/index.html
+
+          echo "✅  Files copied"
+          ls -lh /tmp/git-statistics/reports/
+          ls -lh /tmp/git-statistics/docs/
+
+      - name: Commit and push to git-statistics
+        env:
+          STATS_TOKEN: ${{ secrets.GIT_STATISTICS_TOKEN }}
+          STATS_REPO:  ${{ secrets.GIT_STATISTICS_REPO }}
+        run: |
+          cd /tmp/git-statistics
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "Nothing to commit — statistics unchanged"
+            exit 0
+          fi
+
+          DATESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+          git commit -m "stats: update analytics dashboard ${DATESTAMP} [skip ci]"
+
+          REMOTE="https://x-access-token:${STATS_TOKEN}@github.com/${STATS_REPO}.git"
+          git push "$REMOTE" HEAD:main
+          echo "✅  Pushed statistics dashboard"
+
+      - name: Print dashboard URL
+        env:
+          STATS_REPO: ${{ secrets.GIT_STATISTICS_REPO }}
+        run: |
+          OWNER=$(echo "$STATS_REPO" | cut -d'/' -f1)
+          REPO=$(echo  "$STATS_REPO" | cut -d'/' -f2)
+          echo ""
+          echo "📊 Dashboard updated: https://${OWNER}.github.io/${REPO}"
