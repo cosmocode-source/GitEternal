@@ -1,16 +1,16 @@
 name: "02 · Generate Statistics & Deploy Pages"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Reads git-eternal-data, generates analytics reports and a GitHub Pages
-# dashboard, then pushes everything to git-statistics.
+# Reads GitData, generates analytics reports and a GitHub Pages
+# dashboard, then pushes everything to My-Git-Statistics.
 #
 # Triggered automatically after a successful harvest, or manually.
 #
 # Required secrets:
-#   GIT_ETERNAL_DATA_TOKEN  — fine-grained PAT, contents:read on git-eternal-data
-#   GIT_ETERNAL_DATA_REPO   — owner/git-eternal-data
-#   GIT_STATISTICS_TOKEN    — fine-grained PAT, contents:write on git-statistics
-#   GIT_STATISTICS_REPO     — owner/git-statistics
+#   GIT_ETERNAL_DATA_TOKEN  — fine-grained PAT, contents:read on GitData
+#   GIT_ETERNAL_DATA_REPO   — owner/GitData
+#   GIT_STATISTICS_TOKEN    — fine-grained PAT, contents:write on My-Git-Statistics
+#   GIT_STATISTICS_REPO     — owner/My-Git-Statistics
 # ─────────────────────────────────────────────────────────────────────────────
 
 on:
@@ -48,13 +48,13 @@ jobs:
           git config --global user.name  "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Clone git-eternal-data (read-only)
+      - name: Clone GitData (read-only)
         env:
           DATA_TOKEN: ${{ secrets.GIT_ETERNAL_DATA_TOKEN }}
           DATA_REPO:  ${{ secrets.GIT_ETERNAL_DATA_REPO }}
         run: |
           git clone \
-            --branch git-eternal-data \
+            --branch gitdata \
             --depth 1 \
             "https://x-access-token:${DATA_TOKEN}@github.com/${DATA_REPO}.git" \
             /tmp/vault
@@ -70,7 +70,7 @@ jobs:
           echo "✅  Generated output:"
           ls -lh /tmp/stats-output/
 
-      - name: Clone git-statistics (write)
+      - name: Clone My-Git-Statistics (write)
         env:
           STATS_TOKEN: ${{ secrets.GIT_STATISTICS_TOKEN }}
           STATS_REPO:  ${{ secrets.GIT_STATISTICS_REPO }}
@@ -79,28 +79,28 @@ jobs:
             --branch main \
             --depth 1 \
             "https://x-access-token:${STATS_TOKEN}@github.com/${STATS_REPO}.git" \
-            /tmp/git-statistics
+            /tmp/My-Git-Statistics
 
-      - name: Copy reports and dashboard into git-statistics
+      - name: Copy reports and dashboard into My-Git-Statistics
         run: |
           # Reports (JSON) — consumed by dashboard JS
-          mkdir -p /tmp/git-statistics/reports
-          cp /tmp/stats-output/reports/*.json /tmp/git-statistics/reports/
+          mkdir -p /tmp/My-Git-Statistics/reports
+          cp /tmp/stats-output/reports/*.json /tmp/My-Git-Statistics/reports/
 
           # Dashboard HTML
-          mkdir -p /tmp/git-statistics/docs
-          cp /tmp/stats-output/docs/index.html /tmp/git-statistics/docs/index.html
+          mkdir -p /tmp/My-Git-Statistics/docs
+          cp /tmp/stats-output/docs/index.html /tmp/My-Git-Statistics/docs/index.html
 
           echo "✅  Files copied"
-          ls -lh /tmp/git-statistics/reports/
-          ls -lh /tmp/git-statistics/docs/
+          ls -lh /tmp/My-Git-Statistics/reports/
+          ls -lh /tmp/My-Git-Statistics/docs/
 
-      - name: Commit and push to git-statistics
+      - name: Commit and push to My-Git-Statistics
         env:
           STATS_TOKEN: ${{ secrets.GIT_STATISTICS_TOKEN }}
           STATS_REPO:  ${{ secrets.GIT_STATISTICS_REPO }}
         run: |
-          cd /tmp/git-statistics
+          cd /tmp/My-Git-Statistics
           git add -A
 
           if git diff --cached --quiet; then

@@ -1,7 +1,7 @@
 name: "00 · Initial Setup"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# ONE-TIME SETUP — run this once to bootstrap git-eternal-data and git-statistics.
+# ONE-TIME SETUP — run this once to bootstrap GitData and My-Git-Statistics.
 #
 # Prerequisites
 # ──────────────
@@ -16,10 +16,10 @@ name: "00 · Initial Setup"
 #
 # What it does
 # ─────────────
-# • Creates  git-eternal-data  (private)  — the data vault
-# • Creates  git-statistics    (public)   — the GitHub Pages dashboard
+# • Creates  GitData  (private)  — the data vault
+# • Creates  My-Git-Statistics    (public)   — the GitHub Pages dashboard
 # • Initializes both with a first orphan commit
-# • Enables GitHub Pages on git-statistics  (docs/ folder)
+# • Enables GitHub Pages on My-Git-Statistics  (docs/ folder)
 # • Adds all required secrets to this repo
 # • Deletes itself so it never runs again
 # ─────────────────────────────────────────────────────────────────────────────
@@ -30,11 +30,11 @@ on:
       data_repo_name:
         description: "Name for the data vault repo"
         required: false
-        default: "git-eternal-data"
+        default: "GitData"
       stats_repo_name:
         description: "Name for the statistics repo"
         required: false
-        default: "git-statistics"
+        default: "My-Git-Statistics"
 
 permissions:
   contents: write
@@ -59,8 +59,8 @@ jobs:
           echo "login=$LOGIN" >> $GITHUB_OUTPUT
           echo "Authenticated as: $LOGIN"
 
-      # ── Create git-eternal-data ──────────────────────────────────────────
-      - name: Create git-eternal-data repo
+      # ── Create GitData ──────────────────────────────────────────
+      - name: Create GitData repo
         id: create_data
         run: |
           OWNER="${{ steps.actor.outputs.login }}"
@@ -73,13 +73,13 @@ jobs:
           else
             gh repo create "$FULL" \
               --private \
-              --description "GitEternal data vault — auto-managed, do not edit manually" \
+              --description "GitEternal_v2 data vault — auto-managed, do not edit manually" \
               --no-clone
             echo "✅  Created $FULL (private)"
           fi
           echo "full_name=$FULL" >> $GITHUB_OUTPUT
 
-      - name: Initialize git-eternal-data with orphan commit
+      - name: Initialize GitData with orphan commit
         run: |
           FULL="${{ steps.create_data.outputs.full_name }}"
           OWNER="${{ steps.actor.outputs.login }}"
@@ -91,7 +91,7 @@ jobs:
           TMPDIR=$(mktemp -d)
           cd "$TMPDIR"
           git init
-          git checkout --orphan git-eternal-data
+          git checkout --orphan gitdata
 
           # Seed files
           cat > index.json <<'EOF'
@@ -107,9 +107,9 @@ jobs:
           EOF
 
           cat > README.md <<EOF
-          # git-eternal-data
+          # GitData
 
-          This repository is the **data vault** for [GitEternal](https://github.com/$OWNER/GitEternal).
+          This repository is the **data vault** for [GitEternal_v2](https://github.com/$OWNER/GitEternal_v2).
 
           It is automatically managed by the harvester workflow. **Do not edit files manually.**
 
@@ -129,7 +129,7 @@ jobs:
           ## Privacy
 
           This repo is **private**. Only you can see the raw traffic data.
-          The [git-statistics](https://github.com/$OWNER/${{ github.event.inputs.stats_repo_name }})
+          The [My-Git-Statistics](https://github.com/$OWNER/${{ github.event.inputs.stats_repo_name }})
           repo publishes aggregated, non-sensitive summaries.
           EOF
 
@@ -137,11 +137,11 @@ jobs:
           git commit -m "chore: initialize data vault [skip ci]"
 
           REMOTE_URL="https://x-access-token:${GH_TOKEN}@github.com/${FULL}.git"
-          git push "$REMOTE_URL" "HEAD:git-eternal-data" --force
-          echo "✅  Initialized $FULL on branch git-eternal-data"
+          git push "$REMOTE_URL" "HEAD:gitdata" --force
+          echo "✅  Initialized $FULL on branch gitdata"
 
-      # ── Create git-statistics ─────────────────────────────────────────────
-      - name: Create git-statistics repo
+      # ── Create My-Git-Statistics ─────────────────────────────────────────────
+      - name: Create My-Git-Statistics repo
         id: create_stats
         run: |
           OWNER="${{ steps.actor.outputs.login }}"
@@ -153,13 +153,13 @@ jobs:
           else
             gh repo create "$FULL" \
               --public \
-              --description "GitEternal statistics dashboard — auto-generated, view at https://$OWNER.github.io/$REPO" \
+              --description "GitEternal_v2 statistics dashboard — auto-generated, view at https://$OWNER.github.io/$REPO" \
               --no-clone
             echo "✅  Created $FULL (public)"
           fi
           echo "full_name=$FULL" >> $GITHUB_OUTPUT
 
-      - name: Initialize git-statistics with placeholder dashboard
+      - name: Initialize My-Git-Statistics with placeholder dashboard
         run: |
           FULL="${{ steps.create_stats.outputs.full_name }}"
           OWNER="${{ steps.actor.outputs.login }}"
@@ -178,13 +178,13 @@ jobs:
           echo '[]' > reports/trends.json
 
           cat > README.md <<EOF
-          # git-statistics
+          # My-Git-Statistics
 
           Auto-generated analytics dashboard for **$OWNER**'s GitHub repositories.
 
           📊 **[View Dashboard →](https://$OWNER.github.io/$REPO)**
 
-          Updated weekly by [GitEternal](https://github.com/$OWNER/GitEternal).
+          Updated weekly by [GitEternal_v2](https://github.com/$OWNER/GitEternal_v2).
           EOF
 
           # Placeholder dashboard HTML (will be overwritten by 02-statistics.yml)
@@ -194,7 +194,7 @@ jobs:
           <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>GitEternal Statistics</title>
+            <title>GitEternal_v2 Statistics</title>
             <style>
               * { margin: 0; padding: 0; box-sizing: border-box; }
               body {
@@ -220,7 +220,7 @@ jobs:
           <body>
             <div class="container">
               <div class="logo">⏳</div>
-              <h1>GitEternal Statistics</h1>
+              <h1>GitEternal_v2 Statistics</h1>
               <p>Dashboard initializing — first harvest hasn't run yet.</p>
               <div class="badge">
                 <span class="spinner"></span>
@@ -239,7 +239,7 @@ jobs:
           echo "✅  Initialized $FULL on branch main"
 
       # ── Enable GitHub Pages ───────────────────────────────────────────────
-      - name: Enable GitHub Pages on git-statistics
+      - name: Enable GitHub Pages on My-Git-Statistics
         run: |
           OWNER="${{ steps.actor.outputs.login }}"
           REPO="${{ github.event.inputs.stats_repo_name }}"

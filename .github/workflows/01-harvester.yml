@@ -2,12 +2,12 @@ name: "01 · Harvest Traffic Data"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Runs every Sunday at 06:00 UTC and collects GitHub traffic data for all
-# repos accessible to HARVEST_TOKEN, storing results in git-eternal-data.
+# repos accessible to HARVEST_TOKEN, storing results in GitData.
 #
 # Required secrets (add at Settings → Secrets and variables → Actions):
 #   HARVEST_TOKEN           — classic PAT with 'repo' scope (YOUR account)
-#   GIT_ETERNAL_DATA_TOKEN  — fine-grained PAT with contents:write on git-eternal-data
-#   GIT_ETERNAL_DATA_REPO   — owner/git-eternal-data  (set automatically by 00-setup.yml)
+#   GIT_ETERNAL_DATA_TOKEN  — fine-grained PAT with contents:write on GitData
+#   GIT_ETERNAL_DATA_REPO   — owner/GitData  (set automatically by 00-setup.yml)
 # ─────────────────────────────────────────────────────────────────────────────
 
 on:
@@ -47,7 +47,7 @@ jobs:
         run: |
           echo "=== Token identity ==="
           curl -s -H "Authorization: Bearer $HARVEST_TOKEN" \
-               -H "User-Agent: GitEternal/1.0" \
+               -H "User-Agent: GitEternal_v2/1.0" \
                https://api.github.com/user | python3 -c "
           import json, sys
           d = json.load(sys.stdin)
@@ -56,7 +56,7 @@ jobs:
           "
           echo "=== Token scopes ==="
           curl -s -I -H "Authorization: Bearer $HARVEST_TOKEN" \
-               -H "User-Agent: GitEternal/1.0" \
+               -H "User-Agent: GitEternal_v2/1.0" \
                https://api.github.com/user \
           | grep -i "x-oauth-scopes" || echo "  (fine-grained PAT — no OAuth scopes header)"
 
@@ -74,7 +74,7 @@ jobs:
           script: |
             const { owner, repo } = context.repo;
             const date   = new Date().toISOString().slice(0, 10);
-            const title  = `[GitEternal] Harvest failed ${date}`;
+            const title  = `[GitEternal_v2] Harvest failed ${date}`;
             const runUrl = `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`;
             const { data: issues } = await github.rest.issues.listForRepo({
               owner, repo, state: 'open', per_page: 100, labels: 'git-eternal,bug'

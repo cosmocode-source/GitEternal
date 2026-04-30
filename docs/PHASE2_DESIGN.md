@@ -2,7 +2,7 @@
 
 ## Problem Recap
 
-Users won't provide account credentials (PAT), so the original model of "give me your HARVEST_TOKEN and I'll collect your data" is not viable for a public deployment. The new model shifts to **self-sovereign, GitHub-native analytics** — users fork/use GitEternal in their own GitHub account and data never leaves GitHub.
+Users won't provide account credentials (PAT), so the original model of "give me your HARVEST_TOKEN and I'll collect your data" is not viable for a public deployment. The new model shifts to **self-sovereign, GitHub-native analytics** — users fork/use GitEternal_v2 in their own GitHub account and data never leaves GitHub.
 
 ---
 
@@ -13,7 +13,7 @@ Users won't provide account credentials (PAT), so the original model of "give me
 │  USER'S GITHUB ACCOUNT                                                      │
 │                                                                             │
 │  ┌─────────────────────────┐     ┌─────────────────────────┐               │
-│  │  GitEternal (main)      │     │  git-eternal-data       │               │
+│  │  GitEternal_v2 (main)      │     │  GitData       │               │
 │  │  (forked/cloned)        │     │  (auto-created)         │               │
 │  │                         │     │                         │               │
 │  │  packages/engine/  ─────┼─────►  index.json            │               │
@@ -24,7 +24,7 @@ Users won't provide account credentials (PAT), so the original model of "give me
 │  │                         │  │  └─────────────────────────┘               │
 │  └─────────────────────────┘  │                                             │
 │                                │  ┌─────────────────────────┐               │
-│                                └──►  git-statistics          │               │
+│                                └──►  My-Git-Statistics          │               │
 │                                   │  (auto-created)          │               │
 │                                   │                          │               │
 │                                   │  reports/                │               │
@@ -35,7 +35,7 @@ Users won't provide account credentials (PAT), so the original model of "give me
 │                                   └──────────┬───────────────┘               │
 │                                              │ GitHub Pages                  │
 │                                              ▼                               │
-│                               https://user.github.io/git-statistics          │
+│                               https://user.github.io/My-Git-Statistics          │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -43,7 +43,7 @@ Users won't provide account credentials (PAT), so the original model of "give me
 
 ## Repos
 
-### `git-eternal-data` (data warehouse)
+### `GitData` (data warehouse)
 - **Orphan repo** — no source code, only data
 - Flat JSON file tree: `data/{owner}/{repo}/{year}/{YYYY-MM}.json`
 - `index.json`: aggregated lifetime stats per repo
@@ -53,9 +53,9 @@ Users won't provide account credentials (PAT), so the original model of "give me
 - Written exclusively by the harvester workflow
 - **Private repo recommended** (traffic data is sensitive)
 
-### `git-statistics` (presentation layer)
+### `My-Git-Statistics` (presentation layer)
 - **Orphan repo** — no source code
-- `reports/`: JSON reports generated from `git-eternal-data`
+- `reports/`: JSON reports generated from `GitData`
   - `summary.json`: portfolio-level totals
   - `top_repos.json`: ranked by clones/views
   - `trends.json`: week-over-week deltas
@@ -73,11 +73,11 @@ Users won't provide account credentials (PAT), so the original model of "give me
 **Trigger**: manual dispatch only (`workflow_dispatch`)
 
 **Steps**:
-1. Use GitHub CLI (`gh`) with `GITHUB_TOKEN` to create `git-eternal-data` repo (private)
+1. Use GitHub CLI (`gh`) with `GITHUB_TOKEN` to create `GitData` repo (private)
 2. Push an initial orphan commit (README + empty index.json)
-3. Create `git-statistics` repo (public)
+3. Create `My-Git-Statistics` repo (public)
 4. Push initial orphan commit with README + placeholder `docs/index.html`
-5. Enable GitHub Pages on `git-statistics` from `docs/` folder
+5. Enable GitHub Pages on `My-Git-Statistics` from `docs/` folder
 6. Create `GIT_ETERNAL_DATA_TOKEN` secret in the main repo (using a fine-grained PAT scoped to both new repos — documented in README, user pastes it in)
 7. **Delete itself** (`gh workflow delete 00-setup.yml`)
 
@@ -97,12 +97,12 @@ Users won't provide account credentials (PAT), so the original model of "give me
 **Steps**:
 1. Checkout main repo
 2. Run `packages/engine/harvester.py` (unchanged logic)
-3. Commits to `git-eternal-data`
+3. Commits to `GitData`
 
 **Required secrets**:
 - `HARVEST_TOKEN`: classic PAT with `repo` scope (user's own account — reads their own traffic)
-- `GIT_ETERNAL_DATA_TOKEN`: fine-grained PAT with write access to `git-eternal-data`
-- `GIT_ETERNAL_DATA_REPO`: `{owner}/git-eternal-data`
+- `GIT_ETERNAL_DATA_TOKEN`: fine-grained PAT with write access to `GitData`
+- `GIT_ETERNAL_DATA_REPO`: `{owner}/GitData`
 
 **Key**: The harvester token is the **user's own PAT** reading **their own repos** — no cross-account access needed.
 
@@ -112,17 +112,17 @@ Users won't provide account credentials (PAT), so the original model of "give me
 **Trigger**: `workflow_run` on `01-harvester.yml` completion + `workflow_dispatch`
 
 **Steps**:
-1. Checkout `git-eternal-data` (shallow, read-only)
+1. Checkout `GitData` (shallow, read-only)
 2. Run `packages/engine/statistics.py` — reads vault JSON, generates report JSON
-3. Checkout `git-statistics`
+3. Checkout `My-Git-Statistics`
 4. Write `reports/*.json` and regenerate `docs/index.html` from template
-5. Commit + push to `git-statistics`
+5. Commit + push to `My-Git-Statistics`
 
 **Required secrets**:
-- `GIT_ETERNAL_DATA_TOKEN`: read access to `git-eternal-data`
-- `GIT_STATISTICS_TOKEN`: write access to `git-statistics`
-- `GIT_ETERNAL_DATA_REPO`: `{owner}/git-eternal-data`
-- `GIT_STATISTICS_REPO`: `{owner}/git-statistics`
+- `GIT_ETERNAL_DATA_TOKEN`: read access to `GitData`
+- `GIT_STATISTICS_TOKEN`: write access to `My-Git-Statistics`
+- `GIT_ETERNAL_DATA_REPO`: `{owner}/GitData`
+- `GIT_STATISTICS_REPO`: `{owner}/My-Git-Statistics`
 
 ---
 
@@ -137,18 +137,18 @@ GitHub Traffic API
         │
         │ writes JSON
         ▼
-  git-eternal-data ──────────────────────────────┐
+  GitData ──────────────────────────────┐
                                                   │ reads
                                                   ▼
                                          02-statistics.yml
                                                   │
                                                   │ writes reports + HTML
                                                   ▼
-                                         git-statistics/docs/
+                                         My-Git-Statistics/docs/
                                                   │
                                                   │ GitHub Pages
                                                   ▼
-                                    user.github.io/git-statistics
+                                    user.github.io/My-Git-Statistics
 ```
 
 ---
@@ -157,12 +157,12 @@ GitHub Traffic API
 
 | Concern | Decision | Tradeoff |
 |---|---|---|
-| Privacy | `git-eternal-data` is private | GitHub Pages requires public repo for free tier; stats repo is public but contains only aggregated reports, not raw daily data |
+| Privacy | `GitData` is private | GitHub Pages requires public repo for free tier; stats repo is public but contains only aggregated reports, not raw daily data |
 | No external infra | Everything in GitHub Actions + Pages | Slower updates (weekly), no real-time data |
-| Commit bloat | Statistics writes to a separate repo | Main GitEternal repo stays clean; `git-eternal-data` grows ~1 commit/week |
+| Commit bloat | Statistics writes to a separate repo | Main GitEternal_v2 repo stays clean; `GitData` grows ~1 commit/week |
 | Token scope | User provides their own PAT | Minimal: `repo` scope for traffic API + fine-grained write tokens for the two data repos |
 | Setup friction | One manual workflow dispatch | ~5 min setup; no CLI, no external tools required |
-| Orphan repos | `git-eternal-data` and `git-statistics` have no common history with main | Clean separation; neither pollutes the main repo's history |
+| Orphan repos | `GitData` and `My-Git-Statistics` have no common history with main | Clean separation; neither pollutes the main repo's history |
 | Pages build | Zero-build static HTML | Avoids Node/npm in statistics workflow; instant deploy |
 
 ---
@@ -170,7 +170,7 @@ GitHub Traffic API
 ## File/Workflow Structure
 
 ```
-GitEternal/
+GitEternal_v2/
 ├── .github/
 │   └── workflows/
 │       ├── 00-setup.yml          ← one-time setup (deletes itself)

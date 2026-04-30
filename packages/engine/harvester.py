@@ -1,16 +1,16 @@
 """
 packages/engine/harvester.py
 ─────────────────────────────
-Reads GitHub traffic data and stores it in the git-eternal-data vault.
+Reads GitHub traffic data and stores it in the GitData vault.
 
 Environment variables
 ─────────────────────
   HARVEST_TOKEN           — classic PAT with 'repo' scope (YOUR GitHub account)
-  VAULT_TOKEN             — write-access token for git-eternal-data repo
+  VAULT_TOKEN             — write-access token for GitData repo
                             (falls back to HARVEST_TOKEN if not set)
                             In the new workflow this is GIT_ETERNAL_DATA_TOKEN,
                             but the env var is mapped as VAULT_TOKEN in the step.
-  VAULT_REPO              — full name of the data repo  e.g. alice/git-eternal-data
+  VAULT_REPO              — full name of the data repo  e.g. alice/GitData
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ from .schema import HarvestLog, HarvestRun, MonthLedger, VaultIndex
 
 logger = logging.getLogger(__name__)
 
-VAULT_BRANCH = "git-eternal-data"
+VAULT_BRANCH = "gitdata"
 BOT_NAME     = "github-actions[bot]"
 BOT_EMAIL    = "github-actions[bot]@users.noreply.github.com"
 
@@ -94,7 +94,7 @@ def _append_log(vault_path: Path, run: HarvestRun) -> None:
 def _gh_headers(token: str) -> dict[str, str]:
     return {
         "Authorization": f"Bearer {token}",
-        "User-Agent": "GitEternal/1.0",
+        "User-Agent": "GitEternal_v2/1.0",
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
     }
