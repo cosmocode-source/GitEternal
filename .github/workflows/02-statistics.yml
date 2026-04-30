@@ -48,7 +48,7 @@ jobs:
 
       - name: Clone GitData (read-only)
         env:
-          DATA_TOKEN: ${{ secrets.GIT_ETERNAL_DATA_TOKEN }}
+          DATA_TOKEN: ${{ secrets.HARVEST_TOKEN }}
           DATA_REPO:  ${{ secrets.GIT_ETERNAL_DATA_REPO }}
         run: |
           git clone \
@@ -70,7 +70,7 @@ jobs:
 
       - name: Clone My-Git-Statistics (write)
         env:
-          STATS_TOKEN: ${{ secrets.GIT_STATISTICS_TOKEN }}
+          STATS_TOKEN: ${{ secrets.HARVEST_TOKEN }}
           STATS_REPO:  ${{ secrets.GIT_STATISTICS_REPO }}
         run: |
           git clone \
@@ -95,7 +95,7 @@ jobs:
 
       - name: Commit and push to My-Git-Statistics
         env:
-          STATS_TOKEN: ${{ secrets.GIT_STATISTICS_TOKEN }}
+          STATS_TOKEN: ${{ secrets.HARVEST_TOKEN }}
           STATS_REPO:  ${{ secrets.GIT_STATISTICS_REPO }}
         run: |
           cd /tmp/My-Git-Statistics

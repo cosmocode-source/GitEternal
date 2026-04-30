@@ -63,7 +63,7 @@ jobs:
       - name: Run harvester
         env:
           HARVEST_TOKEN:          ${{ secrets.HARVEST_TOKEN }}
-          VAULT_TOKEN:            ${{ secrets.GIT_ETERNAL_DATA_TOKEN }}
+          VAULT_TOKEN:            ${{ secrets.HARVEST_TOKEN }}
           VAULT_REPO:             ${{ secrets.GIT_ETERNAL_DATA_REPO }}
         run: python -m packages.engine.harvester
 
