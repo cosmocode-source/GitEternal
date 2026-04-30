@@ -73,8 +73,7 @@ jobs:
           else
             gh repo create "$FULL" \
               --private \
-              --description "GitEternal_v2 data vault — auto-managed, do not edit manually" \
-              --no-clone
+              --description "GitEternal_v2 data vault — auto-managed, do not edit manually"
             echo "✅  Created $FULL (private)"
           fi
           echo "full_name=$FULL" >> $GITHUB_OUTPUT
@@ -145,8 +144,7 @@ jobs:
           else
             gh repo create "$FULL" \
               --public \
-              --description "GitEternal_v2 statistics dashboard — auto-generated, view at https://$OWNER.github.io/$REPO" \
-              --no-clone
+              --description "GitEternal_v2 statistics dashboard — auto-generated, view at https://$OWNER.github.io/$REPO"
             echo "✅  Created $FULL (public)"
           fi
           echo "full_name=$FULL" >> $GITHUB_OUTPUT
