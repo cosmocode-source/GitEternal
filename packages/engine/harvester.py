@@ -166,7 +166,8 @@ async def _discover_repos(token: str, client: httpx.AsyncClient) -> tuple[list[s
 
     candidates = [
         r["full_name"] for r in all_repos
-        if r.get("permissions", {}).get("admin") or r.get("permissions", {}).get("push")
+        if (r.get("permissions", {}).get("admin") or r.get("permissions", {}).get("push"))
+        and not r.get("private", False)
     ]
     logger.info(
         "%d repos have push/admin — probing traffic API …",
