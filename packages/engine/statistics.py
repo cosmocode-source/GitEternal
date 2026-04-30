@@ -157,14 +157,12 @@ def _generate_trends(vault: Path, index: VaultIndex) -> list[dict[str, Any]]:
     return sorted(trends, key=lambda r: r["current_week_clones"], reverse=True)
 
 
-def _collect_chart_data(vault: Path, index: VaultIndex, lookback_months: int = 12) -> dict[str, Any]:
+def _collect_chart_data(vault: Path, index: VaultIndex, lookback_months: int = 12) -> list[dict[str, Any]]:
     """
     Aggregate daily clone + view data across all repos for the last N months.
     Returns a dict keyed by date → {clones, views}.
     """
     today    = date.today()
-    cutoff   = date(today.year - (lookback_months // 12), today.month - (lookback_months % 12) % 12 or 12, 1)
-    # Simpler: just go back 365 days
     cutoff   = today - timedelta(days=365)
 
     clone_by_date: dict[str, int] = {}

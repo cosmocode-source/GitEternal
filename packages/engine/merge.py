@@ -97,15 +97,19 @@ def update_index(index: VaultIndex, repo: str, month_ledger: MonthLedger) -> Vau
     else:
         available_months = sorted(set(existing.available_months + [month_ledger.month]))
         month_is_new = month_ledger.month not in existing.available_months
-        total_clone_days = existing.total_clone_days + clone_days if month_is_new else max(
-            existing.total_clone_days, clone_days
-        )
-        lifetime_clones = existing.lifetime_clones + clone_total if month_is_new else max(
-            existing.lifetime_clones, clone_total
-        )
-        lifetime_uniques = existing.lifetime_uniques + unique_total if month_is_new else max(
-            existing.lifetime_uniques, unique_total
-        )
+        if month_is_new:
+            # New month: accumulate on top of existing totals
+            total_clone_days = existing.total_clone_days + clone_days
+            lifetime_clones  = existing.lifetime_clones  + clone_total
+            lifetime_uniques = existing.lifetime_uniques + unique_total
+        else:
+            # Existing month re-harvested: the merged ledger is authoritative.
+            # We cannot subtract the old contribution from cumulative totals, so
+            # we take max() to keep totals monotonically non-decreasing without
+            # double-counting.
+            total_clone_days = max(existing.total_clone_days, clone_days)
+            lifetime_clones  = max(existing.lifetime_clones,  clone_total)
+            lifetime_uniques = max(existing.lifetime_uniques, unique_total)
         candidates_first = [d for d in [existing.first_date, first_date] if d]
         candidates_last = [d for d in [existing.last_date, last_date] if d]
         agg_first = min(candidates_first) if candidates_first else ""

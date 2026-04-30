@@ -93,18 +93,10 @@ jobs:
           git init
           git checkout --orphan gitdata
 
-          # Seed files
-          cat > index.json <<'EOF'
-          {"version": 2, "repos": {}}
-          EOF
-
-          cat > harvest_log.json <<'EOF'
-          {"runs": []}
-          EOF
-
-          cat > config.json <<'EOF'
-          {"tracked_repos": []}
-          EOF
+          # Seed files (use printf to avoid heredoc indentation issues)
+          printf '{"version": 2, "repos": {}}\n' > index.json
+          printf '{"runs": []}\n'               > harvest_log.json
+          printf '{"tracked_repos": []}\n'      > config.json
 
           cat > README.md <<EOF
           # GitData
