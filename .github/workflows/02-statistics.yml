@@ -25,7 +25,7 @@ permissions:
 jobs:
   statistics:
     # Only run if the harvester succeeded (or if manually dispatched)
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
