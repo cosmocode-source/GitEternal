@@ -1,44 +1,39 @@
-name: "00 · Initial Setup"
+name: "00 · Setup Branches"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# ONE-TIME SETUP — run this once to bootstrap GitData and My-Git-Statistics.
+# ONE-TIME SETUP — creates the gitdata and site orphan branches in THIS repo.
+#
+# New architecture (single repo, three branches):
+#
+#   main      — engine code, workflows, Python harvester  [no data, no site]
+#   gitdata   — orphan branch, raw traffic JSON vault     [private history]
+#   site      — orphan branch, static dashboard HTML/CSS  [GitHub Pages source]
 #
 # Prerequisites
-# ──────────────
-# 1. Create a classic PAT (Settings → Developer settings → Personal access tokens)
-#    with scopes:  repo  +  workflow  +  delete:packages (optional)
-#    OR a fine-grained PAT with:
-#      • Repository permissions: Contents (read/write), Pages (write), Workflows (write)
-#      • Account permissions: N/A
-# 2. Add it as a secret named  SETUP_TOKEN  in THIS repo
-#    (Settings → Secrets and variables → Actions → New repository secret)
-# 3. Dispatch this workflow (Actions tab → "00 · Initial Setup" → Run workflow)
-#
-# What it does
 # ─────────────
-# • Creates  GitData  (private)  — the data vault
-# • Creates  My-Git-Statistics    (public)   — the GitHub Pages dashboard
-# • Initializes both with a first orphan commit
-# • Enables GitHub Pages on My-Git-Statistics  (docs/ folder)
-# • Adds all required secrets to this repo
-# • Deletes itself so it never runs again
+# 1. Create a classic PAT (Settings → Developer settings → Personal access tokens)
+#    with scopes:  repo  +  workflow
+# 2. Add it as a secret named  SETUP_TOKEN  in this repo
+#    (Settings → Secrets and variables → Actions → New repository secret)
+# 3. Dispatch this workflow  (Actions → "00 · Setup Branches" → Run workflow)
+#
+# The workflow:
+#   • Checks if gitdata / site branches already exist — skips if they do
+#   • Creates gitdata as an orphan branch with seed JSON files
+#   • Creates site as an orphan branch with a placeholder dashboard
+#   • Enables GitHub Pages from the site branch (root folder)
+#   • Adds required repo variables
+#   • Prints instructions for the 2 secrets still needed manually
+#   • Self-deletes (add  if: false  to the last step during testing)
 # ─────────────────────────────────────────────────────────────────────────────
 
 on:
   workflow_dispatch:
-    inputs:
-      data_repo_name:
-        description: "Name for the data vault repo"
-        required: false
-        default: "GitData"
-      stats_repo_name:
-        description: "Name for the statistics repo"
-        required: false
-        default: "My-Git-Statistics"
 
 permissions:
   contents: write
-  actions: write
+  pages:    write
+  actions:  write
 
 jobs:
   setup:
@@ -49,262 +44,248 @@ jobs:
       GH_TOKEN: ${{ secrets.SETUP_TOKEN }}
 
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SETUP_TOKEN }}
+          fetch-depth: 0        # need full history so we can push new branches
 
       - name: Resolve actor login
         id: actor
         run: |
           LOGIN=$(gh api /user --jq '.login')
-          echo "login=$LOGIN" >> $GITHUB_OUTPUT
-          echo "Authenticated as: $LOGIN"
+          REPO="${{ github.repository }}"
+          echo "login=$LOGIN"   >> $GITHUB_OUTPUT
+          echo "repo=$REPO"     >> $GITHUB_OUTPUT
+          echo "Authenticated as: $LOGIN  |  Repo: $REPO"
 
-      # ── Create GitData ──────────────────────────────────────────
-      - name: Create GitData repo
-        id: create_data
+      # ── Configure git ───────────────────────────────────────────────────────
+      - name: Configure git identity
         run: |
-          OWNER="${{ steps.actor.outputs.login }}"
-          REPO="${{ github.event.inputs.data_repo_name }}"
-          FULL="$OWNER/$REPO"
-
-          # Check if it already exists
-          if gh repo view "$FULL" > /dev/null 2>&1; then
-            echo "⚠️  $FULL already exists — skipping creation"
-          else
-            gh repo create "$FULL" \
-              --private \
-              --description "GitEternal_v2 data vault — auto-managed, do not edit manually"
-            echo "✅  Created $FULL (private)"
-          fi
-          echo "full_name=$FULL" >> $GITHUB_OUTPUT
-
-      - name: Initialize GitData with orphan commit
-        run: |
-          FULL="${{ steps.create_data.outputs.full_name }}"
-          OWNER="${{ steps.actor.outputs.login }}"
-          REPO="${{ github.event.inputs.data_repo_name }}"
-
           git config --global user.name  "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          TMPDIR=$(mktemp -d)
-          cd "$TMPDIR"
+      # ── gitdata branch ──────────────────────────────────────────────────────
+      - name: Create gitdata orphan branch
+        run: |
+          REPO="${{ steps.actor.outputs.repo }}"
+
+          # Check if branch already exists
+          if git ls-remote --exit-code --heads origin gitdata > /dev/null 2>&1; then
+            echo "⚠️  Branch 'gitdata' already exists — skipping"
+            exit 0
+          fi
+
+          echo "Creating orphan branch: gitdata"
+          WORK=$(mktemp -d)
+          cd "$WORK"
+
           git init
           git checkout --orphan gitdata
 
-          # Seed files (use printf to avoid heredoc indentation issues)
-          printf '{"version": 2, "repos": {}}\n' > index.json
-          printf '{"runs": []}\n'               > harvest_log.json
-          printf '{"tracked_repos": []}\n'      > config.json
+          # ── Seed files ──────────────────────────────────────────────────────
+          printf '{"version":2,"repos":{}}\n'        > index.json
+          printf '{"runs":[]}\n'                     > harvest_log.json
+          printf '{"tracked_repos":[]}\n'            > config.json
+          mkdir -p data
 
-          cat > README.md <<EOF
-          # GitData
+          cat > README.md << 'EOF'
+          # gitdata branch
 
-          This repository is the **data vault** for [GitEternal_v2](https://github.com/$OWNER/GitEternal_v2).
+          **Orphan branch — do not merge into main.**
 
-          It is automatically managed by the harvester workflow. **Do not edit files manually.**
+          This branch is the raw traffic vault for GitEternal.
+          All files here are written automatically by the `01 · Harvest` workflow.
+          Do not edit manually.
 
           ## Structure
-
-          \`\`\`
-          index.json          — lifetime stats summary per repo
+          ```
+          index.json          — lifetime stats index per repo
           harvest_log.json    — last 50 harvest run records
-          config.json         — list of tracked repos
-          data/               — raw monthly traffic ledgers
+          config.json         — harvester runtime config
+          owner_stats.json    — GitHub profile + commit/PR/issue counts
+          data/
             {owner}/
               {repo}/
                 {year}/
                   {YYYY-MM}.json
-          \`\`\`
-
-          ## Privacy
-
-          This repo is **private**. Only you can see the raw traffic data.
-          The [My-Git-Statistics](https://github.com/$OWNER/${{ github.event.inputs.stats_repo_name }})
-          repo publishes aggregated, non-sensitive summaries.
+          ```
           EOF
 
           git add -A
-          git commit -m "chore: initialize data vault [skip ci]"
+          git commit -m "chore: initialize gitdata vault [skip ci]"
 
-          REMOTE_URL="https://x-access-token:${GH_TOKEN}@github.com/${FULL}.git"
-          git push "$REMOTE_URL" "HEAD:gitdata" --force
-          echo "✅  Initialized $FULL on branch gitdata"
+          REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          git push "$REMOTE" "HEAD:gitdata"
+          echo "✅  Branch gitdata created and pushed"
 
-      # ── Create My-Git-Statistics ─────────────────────────────────────────────
-      - name: Create My-Git-Statistics repo
-        id: create_stats
+      # ── site branch ─────────────────────────────────────────────────────────
+      - name: Create site orphan branch
         run: |
           OWNER="${{ steps.actor.outputs.login }}"
-          REPO="${{ github.event.inputs.stats_repo_name }}"
-          FULL="$OWNER/$REPO"
+          REPO="${{ steps.actor.outputs.repo }}"
+          REPO_NAME=$(echo "$REPO" | cut -d'/' -f2)
 
-          if gh repo view "$FULL" > /dev/null 2>&1; then
-            echo "⚠️  $FULL already exists — skipping creation"
-          else
-            gh repo create "$FULL" \
-              --public \
-              --description "GitEternal_v2 statistics dashboard — auto-generated, view at https://$OWNER.github.io/$REPO"
-            echo "✅  Created $FULL (public)"
+          if git ls-remote --exit-code --heads origin site > /dev/null 2>&1; then
+            echo "⚠️  Branch 'site' already exists — skipping"
+            exit 0
           fi
-          echo "full_name=$FULL" >> $GITHUB_OUTPUT
 
-      - name: Initialize My-Git-Statistics with placeholder dashboard
-        run: |
-          FULL="${{ steps.create_stats.outputs.full_name }}"
-          OWNER="${{ steps.actor.outputs.login }}"
-          REPO="${{ github.event.inputs.stats_repo_name }}"
+          echo "Creating orphan branch: site"
+          WORK=$(mktemp -d)
+          cd "$WORK"
 
-          TMPDIR=$(mktemp -d)
-          cd "$TMPDIR"
           git init
-          git checkout --orphan main
+          git checkout --orphan site
 
-          mkdir -p docs reports
-
-          # Placeholder reports
-          echo '{"generated_at":"","total_repos":0,"lifetime_clones":0,"lifetime_uniques":0,"most_active_repo":null}' > reports/summary.json
-          echo '[]' > reports/top_repos.json
-          echo '[]' > reports/trends.json
-
-          cat > README.md <<EOF
-          # My-Git-Statistics
-
-          Auto-generated analytics dashboard for **$OWNER**'s GitHub repositories.
-
-          📊 **[View Dashboard →](https://$OWNER.github.io/$REPO)**
-
-          Updated weekly by [GitEternal_v2](https://github.com/$OWNER/GitEternal_v2).
-          EOF
-
-          # Placeholder dashboard HTML (will be overwritten by 02-statistics.yml)
-          cat > docs/index.html <<'HTMLEOF'
+          # ── Placeholder dashboard ────────────────────────────────────────────
+          cat > index.html << HTMLEOF
           <!DOCTYPE html>
           <html lang="en">
           <head>
             <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>GitEternal_v2 Statistics</title>
+            <meta name="viewport" content="width=device-width,initial-scale=1.0">
+            <title>GitEternal — Initializing</title>
             <style>
-              * { margin: 0; padding: 0; box-sizing: border-box; }
-              body {
-                min-height: 100vh; display: flex; align-items: center; justify-content: center;
-                background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-              }
-              .container { text-align: center; padding: 2rem; }
-              .logo { font-size: 3rem; margin-bottom: 1rem; }
-              h1 { font-size: 1.8rem; font-weight: 600; margin-bottom: 0.5rem; color: #f0f6fc; }
-              p { color: #8b949e; margin-bottom: 1.5rem; }
-              .badge {
-                display: inline-block; background: #21262d; border: 1px solid #30363d;
-                border-radius: 6px; padding: 0.5rem 1rem; color: #58a6ff; font-size: 0.875rem;
-              }
-              .spinner {
-                width: 20px; height: 20px; border: 2px solid #30363d; border-top-color: #58a6ff;
-                border-radius: 50%; animation: spin 1s linear infinite; display: inline-block;
-                vertical-align: middle; margin-right: 8px;
-              }
-              @keyframes spin { to { transform: rotate(360deg); } }
+              *{margin:0;padding:0;box-sizing:border-box}
+              body{min-height:100vh;display:flex;align-items:center;justify-content:center;
+                   background:#0d1117;color:#c9d1d9;
+                   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+              .box{text-align:center;padding:2rem;max-width:480px}
+              h1{font-size:1.75rem;color:#f0f6fc;margin:.75rem 0 .5rem}
+              p{color:#8b949e;line-height:1.6;margin-bottom:1.5rem}
+              .spinner{width:20px;height:20px;border:2px solid #30363d;
+                       border-top-color:#58a6ff;border-radius:50%;
+                       animation:spin 1s linear infinite;display:inline-block;
+                       vertical-align:middle;margin-right:8px}
+              @keyframes spin{to{transform:rotate(360deg)}}
+              .badge{display:inline-block;background:#21262d;border:1px solid #30363d;
+                     border-radius:6px;padding:.5rem 1rem;color:#58a6ff;font-size:.875rem}
             </style>
           </head>
           <body>
-            <div class="container">
-              <div class="logo">⏳</div>
-              <h1>GitEternal_v2 Statistics</h1>
-              <p>Dashboard initializing — first harvest hasn't run yet.</p>
-              <div class="badge">
-                <span class="spinner"></span>
-                Waiting for first harvest run...
-              </div>
+            <div class="box">
+              <div style="font-size:3rem">⏳</div>
+              <h1>GitEternal Statistics</h1>
+              <p>Dashboard initializing.<br>Run the <strong>01 · Harvest</strong> workflow to populate your data.</p>
+              <div class="badge"><span class="spinner"></span>Waiting for first harvest…</div>
             </div>
           </body>
           </html>
           HTMLEOF
 
+          cat > README.md << EOF
+          # site branch
+
+          **Orphan branch — do not merge into main.**
+
+          This branch contains the static dashboard served via GitHub Pages.
+          All files here are written automatically by the \`02 · Statistics\` workflow.
+
+          📊 **[View Dashboard →](https://${OWNER}.github.io/${REPO_NAME})**
+          EOF
+
           git add -A
-          git commit -m "chore: initialize statistics repo [skip ci]"
+          git commit -m "chore: initialize site branch [skip ci]"
 
-          REMOTE_URL="https://x-access-token:${GH_TOKEN}@github.com/${FULL}.git"
-          git push "$REMOTE_URL" "HEAD:main" --force
-          echo "✅  Initialized $FULL on branch main"
+          REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          git push "$REMOTE" "HEAD:site"
+          echo "✅  Branch site created and pushed"
 
-      # ── Enable GitHub Pages ───────────────────────────────────────────────
-      - name: Enable GitHub Pages on My-Git-Statistics
+      # ── Enable GitHub Pages ─────────────────────────────────────────────────
+      - name: Enable GitHub Pages from site branch
         run: |
           OWNER="${{ steps.actor.outputs.login }}"
-          REPO="${{ github.event.inputs.stats_repo_name }}"
+          REPO_NAME=$(echo "${{ steps.actor.outputs.repo }}" | cut -d'/' -f2)
 
-          # Wait a moment for the repo to be ready
-          sleep 3
+          sleep 4   # give GitHub a moment after the push
 
-          # Enable Pages via API (source: docs/ folder on main branch)
-          RESPONSE=$(gh api \
+          # Try to enable Pages (may already be enabled — that's fine)
+          gh api \
             --method POST \
             -H "Accept: application/vnd.github+json" \
-            "/repos/$OWNER/$REPO/pages" \
-            -f "source[branch]=main" \
-            -f "source[path]=/docs" \
-            2>&1 || true)
+            "/repos/$OWNER/$REPO_NAME/pages" \
+            -f "source[branch]=site" \
+            -f "source[path]=/" \
+            2>&1 | tee /tmp/pages_response.txt || true
 
-          echo "Pages API response: $RESPONSE"
-          echo "✅  GitHub Pages enabled at https://$OWNER.github.io/$REPO"
+          if grep -q "already enabled\|409\|422" /tmp/pages_response.txt 2>/dev/null; then
+            # Already enabled — just update the source branch
+            gh api \
+              --method PUT \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/$OWNER/$REPO_NAME/pages" \
+              -f "source[branch]=site" \
+              -f "source[path]=/" \
+              2>&1 || true
+          fi
 
-      # ── Store secrets in main repo ────────────────────────────────────────
-      - name: Add secrets to main repo
+          echo "✅  GitHub Pages configured → https://${OWNER}.github.io/${REPO_NAME}"
+
+      # ── Store repo variables ────────────────────────────────────────────────
+      - name: Set repository variables
+        run: |
+          REPO="${{ steps.actor.outputs.repo }}"
+          OWNER="${{ steps.actor.outputs.login }}"
+          REPO_NAME=$(echo "$REPO" | cut -d'/' -f2)
+
+          # Store as Actions variables (visible in logs, not sensitive)
+          gh variable set GIT_ETERNAL_OWNER     --body "$OWNER"     --repo "$REPO"
+          gh variable set GIT_ETERNAL_REPO_NAME --body "$REPO_NAME" --repo "$REPO"
+
+          echo "✅  Variables set: GIT_ETERNAL_OWNER=$OWNER  GIT_ETERNAL_REPO_NAME=$REPO_NAME"
+
+      # ── Instructions ────────────────────────────────────────────────────────
+      - name: Print next steps
         run: |
           OWNER="${{ steps.actor.outputs.login }}"
-          DATA_FULL="${{ steps.create_data.outputs.full_name }}"
-          STATS_FULL="${{ steps.create_stats.outputs.full_name }}"
-          MAIN_REPO="${{ github.repository }}"
-
-          # Store repo names as secrets (not sensitive, but convenient)
-          gh secret set GIT_ETERNAL_DATA_REPO \
-            --body "$DATA_FULL" \
-            --repo "$MAIN_REPO"
-
-          gh secret set GIT_STATISTICS_REPO \
-            --body "$STATS_FULL" \
-            --repo "$MAIN_REPO"
+          REPO="${{ steps.actor.outputs.repo }}"
+          REPO_NAME=$(echo "$REPO" | cut -d'/' -f2)
 
           echo ""
-          echo "╔══════════════════════════════════════════════════════════════╗"
-          echo "║              SETUP COMPLETE — ACTION REQUIRED                ║"
-          echo "╠══════════════════════════════════════════════════════════════╣"
-          echo "║                                                              ║"
-          echo "║  You still need to add 3 secrets manually:                  ║"
-          echo "║                                                              ║"
-          echo "║  1. HARVEST_TOKEN                                            ║"
-          echo "║     Classic PAT with 'repo' scope                           ║"
-          echo "║     (reads YOUR traffic data from GitHub API)               ║"
-          echo "║                                                              ║"
-          echo "║  2. GIT_ETERNAL_DATA_TOKEN                                   ║"
-          echo "║     Fine-grained PAT — write access to:                     ║"
-          echo "║       $DATA_FULL"
-          echo "║     Permission: Repository contents (read/write)            ║"
-          echo "║                                                              ║"
-          echo "║  3. GIT_STATISTICS_TOKEN                                     ║"
-          echo "║     Fine-grained PAT — write access to:                     ║"
-          echo "║       $STATS_FULL"
-          echo "║     Permission: Repository contents (read/write)            ║"
-          echo "║                                                              ║"
-          echo "║  Add them at:                                                ║"
-          echo "║  https://github.com/$MAIN_REPO/settings/secrets/actions     ║"
-          echo "║                                                              ║"
-          echo "╚══════════════════════════════════════════════════════════════╝"
+          echo "╔══════════════════════════════════════════════════════════════════╗"
+          echo "║              ✅  SETUP COMPLETE — ACTION REQUIRED               ║"
+          echo "╠══════════════════════════════════════════════════════════════════╣"
+          echo "║                                                                  ║"
+          echo "║  Branches created:                                               ║"
+          echo "║    main     — engine code + workflows (this branch)             ║"
+          echo "║    gitdata  — orphan, raw traffic vault                         ║"
+          echo "║    site     — orphan, GitHub Pages dashboard                    ║"
+          echo "║                                                                  ║"
+          echo "║  Add 2 secrets at:                                               ║"
+          echo "║  https://github.com/$REPO/settings/secrets/actions"
+          echo "║                                                                  ║"
+          echo "║  ┌──────────────────┬────────────────────────────────────────┐  ║"
+          echo "║  │ Secret name      │ Value                                  │  ║"
+          echo "║  ├──────────────────┼────────────────────────────────────────┤  ║"
+          echo "║  │ HARVEST_TOKEN    │ Classic PAT with 'repo' scope          │  ║"
+          echo "║  │                  │ (reads YOUR traffic + profile data)    │  ║"
+          echo "║  ├──────────────────┼────────────────────────────────────────┤  ║"
+          echo "║  │ ACTIONS_TOKEN    │ Classic PAT with 'repo' + 'workflow'   │  ║"
+          echo "║  │                  │ (writes to gitdata + site branches)    │  ║"
+          echo "║  └──────────────────┴────────────────────────────────────────┘  ║"
+          echo "║                                                                  ║"
+          echo "║  Then run:  Actions → '01 · Harvest Traffic Data'               ║"
+          echo "║                                                                  ║"
+          echo "║  Dashboard will be live at:                                      ║"
+          echo "║  https://${OWNER}.github.io/${REPO_NAME}"
+          echo "║                                                                  ║"
+          echo "╚══════════════════════════════════════════════════════════════════╝"
 
-      # ── Self-destruct ─────────────────────────────────────────────────────
+      # ── Self-delete (comment out `if: false` during testing) ────────────────
       - name: Delete this setup workflow
-        if: false  # need to turn this to true so that the auto delete works properly, this si false for testing purposes.
+        # if: false   # ← uncomment this line while testing to prevent self-deletion
         run: |
-          MAIN_REPO="${{ github.repository }}"
-          # Delete the workflow file via API so it doesn't clutter the Actions tab
-          SHA=$(gh api "/repos/$MAIN_REPO/contents/.github/workflows/00-setup.yml" --jq '.sha' 2>/dev/null || true)
+          REPO="${{ steps.actor.outputs.repo }}"
+          SHA=$(gh api "/repos/$REPO/contents/.github/workflows/00-setup.yml" \
+                --jq '.sha' 2>/dev/null || true)
           if [ -n "$SHA" ]; then
             gh api \
               --method DELETE \
-              "/repos/$MAIN_REPO/contents/.github/workflows/00-setup.yml" \
-              -f "message=chore: remove setup workflow after successful init [skip ci]" \
+              "/repos/$REPO/contents/.github/workflows/00-setup.yml" \
+              -f "message=chore: remove setup workflow after init [skip ci]" \
               -f "sha=$SHA" \
-              -f "branch=main" || echo "⚠️  Could not delete workflow file — remove it manually"
-            echo "✅  Setup workflow deleted"
+              -f "branch=main" \
+              && echo "✅  Setup workflow self-deleted" \
+              || echo "⚠️  Could not delete — remove .github/workflows/00-setup.yml manually"
           fi

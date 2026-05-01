@@ -144,3 +144,46 @@ async def fetch_repo_info(
         "topics":      data.get("topics", []),
         "description": data.get("description") or "",
     }
+
+
+async def fetch_owner_stats(
+    owner: str,
+    token: str,
+    *,
+    client: httpx.AsyncClient,
+) -> dict[str, Any]:
+    """Fetch owner-level stats: total commits, PRs, issues via search API."""
+    results: dict[str, Any] = {}
+    queries = {
+        "total_commits": f"author:{owner} type:commit",
+        "total_prs":     f"author:{owner} type:pr",
+        "total_issues":  f"author:{owner} type:issue",
+    }
+    for key, q in queries.items():
+        try:
+            data = await _get_json(
+                client, "/search/commits" if "commit" in q else "/search/issues",
+                token, params={"q": q, "per_page": 1}
+            )
+            results[key] = data.get("total_count", 0)
+        except Exception:
+            results[key] = 0
+    # Also fetch follower/following counts
+    try:
+        user = await _get_json(client, f"/users/{owner}", token)
+        results["followers"]  = user.get("followers", 0)
+        results["following"]  = user.get("following", 0)
+        results["avatar_url"] = user.get("avatar_url", "")
+        results["bio"]        = user.get("bio") or ""
+        results["location"]   = user.get("location") or ""
+        results["blog"]       = user.get("blog") or ""
+        results["public_repos"] = user.get("public_repos", 0)
+    except Exception:
+        results.setdefault("followers", 0)
+        results.setdefault("following", 0)
+        results.setdefault("avatar_url", "")
+        results.setdefault("bio", "")
+        results.setdefault("location", "")
+        results.setdefault("blog", "")
+        results.setdefault("public_repos", 0)
+    return results

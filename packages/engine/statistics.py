@@ -80,14 +80,29 @@ def _generate_summary(index: VaultIndex, owner: str = "") -> dict[str, Any]:
     }
     total_clones  = sum(m.lifetime_clones  for m in repos.values())
     total_uniques = sum(m.lifetime_uniques for m in repos.values())
+    total_stars   = sum(m.stars  for m in repos.values())
+    total_forks   = sum(m.forks  for m in repos.values())
     most_active   = max(repos, key=lambda r: repos[r].lifetime_clones) if repos else None
+    most_starred  = max(repos, key=lambda r: repos[r].stars) if repos else None
+
+    # Collect language breakdown
+    lang_counts: dict[str, int] = {}
+    for m in repos.values():
+        if m.language:
+            lang_counts[m.language] = lang_counts.get(m.language, 0) + 1
+    top_lang = max(lang_counts, key=lang_counts.__getitem__) if lang_counts else ""
 
     return {
-        "generated_at":   datetime.now(tz=UTC).isoformat(),
-        "total_repos":    len(repos),
+        "generated_at":     datetime.now(tz=UTC).isoformat(),
+        "total_repos":      len(repos),
         "lifetime_clones":  total_clones,
         "lifetime_uniques": total_uniques,
+        "total_stars":      total_stars,
+        "total_forks":      total_forks,
         "most_active_repo": most_active,
+        "most_starred_repo": most_starred,
+        "top_language":     top_lang,
+        "language_breakdown": lang_counts,
     }
 
 
@@ -207,233 +222,138 @@ def _render_html(
     trends: list[dict[str, Any]],
     chart_data: list[dict[str, Any]],
     owner: str,
+    owner_stats: dict[str, Any] | None = None,
 ) -> str:
+    os_  = owner_stats or {}
     summary_json    = json.dumps(summary,    separators=(",", ":"))
     top_repos_json  = json.dumps(top_repos,  separators=(",", ":"))
     trends_json     = json.dumps(trends,     separators=(",", ":"))
     chart_data_json = json.dumps(chart_data, separators=(",", ":"))
-    generated_at    = summary.get("generated_at", "")
+    owner_stats_json = json.dumps(os_,       separators=(",", ":"))
+
+    avatar   = os_.get("avatar_url", "")
+    bio      = os_.get("bio", "")
+    location = os_.get("location", "")
+    blog     = os_.get("blog", "")
 
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{owner} · GitEternal_v2 Statistics</title>
+  <title>{owner} · GitHub Statistics</title>
   <style>
     *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
-
     :root {{
-      --bg:        #0d1117;
-      --surface:   #161b22;
-      --border:    #30363d;
-      --text:      #c9d1d9;
-      --muted:     #8b949e;
-      --blue:      #58a6ff;
-      --green:     #3fb950;
-      --red:       #f85149;
-      --purple:    #bc8cff;
-      --orange:    #d29922;
-      --radius:    8px;
-      --shadow:    0 1px 3px rgba(0,0,0,.4);
+      --bg:      #0d1117; --surface: #161b22; --surface2: #21262d;
+      --border:  #30363d; --text:    #c9d1d9; --muted:    #8b949e;
+      --blue:    #58a6ff; --green:   #3fb950; --red:      #f85149;
+      --purple:  #bc8cff; --orange:  #d29922; --yellow:   #e3b341;
+      --radius:  8px;     --shadow:  0 1px 3px rgba(0,0,0,.4);
     }}
+    body {{ background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:14px; line-height:1.5; min-height:100vh; }}
 
-    body {{
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
-      font-size: 14px;
-      line-height: 1.5;
-      min-height: 100vh;
-    }}
+    /* ── Header ── */
+    .header {{ background:var(--surface); border-bottom:1px solid var(--border); padding:1rem 1.5rem; display:flex; align-items:center; gap:1rem; }}
+    .header-avatar {{ width:48px; height:48px; border-radius:50%; border:2px solid var(--border); object-fit:cover; }}
+    .header-avatar-placeholder {{ width:48px; height:48px; border-radius:50%; background:var(--surface2); border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:1.4rem; }}
+    .header-info h1 {{ font-size:1.1rem; font-weight:600; color:#f0f6fc; }}
+    .header-info .sub {{ color:var(--muted); font-size:0.8rem; }}
+    .header-meta {{ margin-left:auto; color:var(--muted); font-size:0.75rem; text-align:right; }}
 
-    /* Layout */
-    .header {{
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }}
-    .header-logo {{ font-size: 1.5rem; }}
-    .header h1 {{ font-size: 1.125rem; font-weight: 600; color: #f0f6fc; }}
-    .header-meta {{ margin-left: auto; color: var(--muted); font-size: 0.8125rem; }}
+    .main {{ max-width:1200px; margin:0 auto; padding:1.5rem; }}
 
-    .main {{ max-width: 1100px; margin: 0 auto; padding: 1.5rem; }}
+    /* ── Profile card ── */
+    .profile-card {{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem 1.5rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; }}
+    .profile-avatar {{ width:72px; height:72px; border-radius:50%; border:3px solid var(--border); object-fit:cover; flex-shrink:0; }}
+    .profile-avatar-ph {{ width:72px; height:72px; border-radius:50%; background:var(--surface2); border:3px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:2rem; flex-shrink:0; }}
+    .profile-details h2 {{ font-size:1.2rem; font-weight:700; color:#f0f6fc; }}
+    .profile-details .bio {{ color:var(--muted); font-size:0.85rem; margin-top:.25rem; max-width:500px; }}
+    .profile-meta {{ display:flex; gap:1rem; flex-wrap:wrap; margin-top:.5rem; font-size:0.78rem; color:var(--muted); }}
+    .profile-meta span {{ display:flex; align-items:center; gap:.3rem; }}
+    .profile-links {{ margin-left:auto; display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; }}
+    .profile-links a {{ color:var(--blue); text-decoration:none; font-size:0.82rem; }}
+    .profile-links a:hover {{ text-decoration:underline; }}
 
-    /* Cards */
-    .card {{
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }}
-    .card-header {{
-      padding: 1rem 1.25rem 0.75rem;
-      border-bottom: 1px solid var(--border);
-      font-weight: 600;
-      color: #f0f6fc;
-      font-size: 0.9375rem;
-    }}
-    .card-body {{ padding: 1.25rem; }}
+    /* ── Stat strip ── */
+    .stat-grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.875rem; margin-bottom:1.5rem; }}
+    .stat-card {{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.25rem; box-shadow:var(--shadow); position:relative; overflow:hidden; }}
+    .stat-card::before {{ content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--accent-color,var(--blue)); }}
+    .stat-label {{ color:var(--muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:.05em; margin-bottom:.3rem; }}
+    .stat-value {{ font-size:1.6rem; font-weight:700; color:#f0f6fc; letter-spacing:-0.5px; }}
+    .stat-sub {{ color:var(--muted); font-size:0.72rem; margin-top:.15rem; }}
+    .stat-icon {{ position:absolute; right:1rem; top:50%; transform:translateY(-50%); font-size:1.6rem; opacity:.18; }}
 
-    /* Summary strip */
-    .summary-grid {{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }}
-    .stat-card {{
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.25rem;
-      box-shadow: var(--shadow);
-    }}
-    .stat-label {{ color: var(--muted); font-size: 0.8125rem; margin-bottom: 0.3rem; }}
-    .stat-value {{ font-size: 1.75rem; font-weight: 700; color: #f0f6fc; letter-spacing: -0.5px; }}
-    .stat-sub   {{ color: var(--muted); font-size: 0.75rem; margin-top: 0.2rem; }}
+    /* ── Cards ── */
+    .card {{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); }}
+    .card-header {{ padding:.875rem 1.25rem; border-bottom:1px solid var(--border); font-weight:600; color:#f0f6fc; font-size:.9rem; display:flex; align-items:center; gap:.5rem; }}
+    .card-body {{ padding:1.25rem; }}
+    .mb {{ margin-bottom:1rem; }}
 
-    /* Chart */
-    .chart-wrap {{ position: relative; height: 200px; margin-bottom: 0.5rem; }}
-    canvas {{ width: 100% !important; }}
+    /* ── Chart ── */
+    .chart-wrap {{ position:relative; height:180px; }}
+    canvas {{ width:100%!important; }}
+    .chart-legend {{ display:flex; gap:1.5rem; font-size:.72rem; color:var(--muted); margin-top:.5rem; }}
+    .chart-legend span {{ display:flex; align-items:center; gap:.3rem; }}
+    .legend-dot {{ width:10px; height:10px; border-radius:2px; display:inline-block; }}
 
-    /* Table */
-    .table-wrap {{ overflow-x: auto; }}
-    table {{ width: 100%; border-collapse: collapse; font-size: 0.8125rem; }}
-    th {{
-      text-align: left; padding: 0.6rem 0.75rem;
-      color: var(--muted); font-weight: 500;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }}
-    td {{
-      padding: 0.65rem 0.75rem;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-      white-space: nowrap;
-    }}
-    tr:last-child td {{ border-bottom: none; }}
-    tr:hover td {{ background: rgba(255,255,255,.03); }}
+    /* ── Language bar ── */
+    .lang-bar-wrap {{ margin-bottom:.75rem; }}
+    .lang-bar {{ display:flex; height:8px; border-radius:4px; overflow:hidden; gap:2px; }}
+    .lang-bar-seg {{ height:100%; border-radius:2px; transition:flex .3s; }}
+    .lang-legend {{ display:flex; flex-wrap:wrap; gap:.5rem 1rem; margin-top:.6rem; font-size:.75rem; color:var(--muted); }}
+    .lang-legend-item {{ display:flex; align-items:center; gap:.3rem; }}
+    .lang-dot {{ width:10px; height:10px; border-radius:50%; flex-shrink:0; }}
 
-    .repo-link {{ color: var(--blue); text-decoration: none; font-weight: 500; }}
-    .repo-link:hover {{ text-decoration: underline; }}
+    /* ── Two-col ── */
+    .grid-2 {{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }}
+    @media(max-width:750px) {{ .grid-2 {{ grid-template-columns:1fr; }} }}
 
-    /* Repo cards grid */
-    .repos-section {{
-      margin-bottom: 1rem;
-    }}
-    .repos-section .card-header {{
-      padding: 1rem 1.25rem 0.75rem;
-      border-bottom: 1px solid var(--border);
-      font-weight: 600;
-      color: #f0f6fc;
-      font-size: 0.9375rem;
-      background: var(--surface);
-      border-radius: var(--radius) var(--radius) 0 0;
-      border: 1px solid var(--border);
-      border-bottom: none;
-    }}
-    .repo-cards {{
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1rem;
-      padding: 1rem 0;
-    }}
-    .repo-card {{
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 1.1rem 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      transition: border-color 0.15s;
-    }}
-    .repo-card:hover {{ border-color: var(--blue); }}
-    .repo-card-title {{
-      font-weight: 600;
-      font-size: 0.9375rem;
-    }}
-    .repo-card-title a {{ color: var(--blue); text-decoration: none; }}
-    .repo-card-title a:hover {{ text-decoration: underline; }}
-    .repo-card-desc {{
-      color: var(--muted);
-      font-size: 0.8rem;
-      line-height: 1.45;
-      flex: 1;
-    }}
-    .repo-card-lang {{
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-size: 0.78rem;
-      color: var(--muted);
-    }}
-    .lang-dot {{
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: var(--orange);
-      flex-shrink: 0;
-    }}
-    .repo-card-meta {{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 0.2rem;
-    }}
-    .repo-card-meta span {{ display: flex; align-items: center; gap: 0.25rem; }}
-    .repo-card-topics {{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.35rem;
-      margin-top: 0.1rem;
-    }}
-    .topic-tag {{
-      background: rgba(88,166,255,.1);
-      color: var(--blue);
-      border-radius: 20px;
-      padding: 0.1rem 0.5rem;
-      font-size: 0.7rem;
-    }}
+    /* ── Table ── */
+    .table-wrap {{ overflow-x:auto; }}
+    table {{ width:100%; border-collapse:collapse; font-size:.8rem; }}
+    th {{ text-align:left; padding:.55rem .75rem; color:var(--muted); font-weight:500; border-bottom:1px solid var(--border); white-space:nowrap; }}
+    td {{ padding:.6rem .75rem; border-bottom:1px solid var(--border); color:var(--text); }}
+    tr:last-child td {{ border-bottom:none; }}
+    tr:hover td {{ background:rgba(255,255,255,.025); }}
+    .repo-link {{ color:var(--blue); text-decoration:none; font-weight:500; }}
+    .repo-link:hover {{ text-decoration:underline; }}
 
-    .badge {{
-      display: inline-block;
-      padding: 0.15rem 0.5rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 500;
-    }}
-    .badge-up   {{ background: rgba(63,185,80,.15);  color: var(--green);  }}
-    .badge-down {{ background: rgba(248,81,73,.15);  color: var(--red);    }}
-    .badge-flat {{ background: rgba(139,148,158,.12); color: var(--muted); }}
+    /* ── Badges ── */
+    .badge {{ display:inline-block; padding:.15rem .45rem; border-radius:20px; font-size:.72rem; font-weight:500; }}
+    .badge-up   {{ background:rgba(63,185,80,.15);   color:var(--green); }}
+    .badge-down {{ background:rgba(248,81,73,.15);   color:var(--red); }}
+    .badge-flat {{ background:rgba(139,148,158,.12); color:var(--muted); }}
 
-    /* Two-column layout */
-    .grid-2 {{
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }}
-    @media (max-width: 700px) {{
-      .grid-2 {{ grid-template-columns: 1fr; }}
-    }}
+    /* ── Repo cards ── */
+    .repos-header {{ font-weight:600; color:#f0f6fc; font-size:.9rem; margin-bottom:.875rem; display:flex; align-items:center; gap:.5rem; }}
+    .repo-cards {{ display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:.875rem; margin-bottom:1.5rem; }}
+    .repo-card {{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.1rem; display:flex; flex-direction:column; gap:.45rem; transition:border-color .15s,box-shadow .15s; }}
+    .repo-card:hover {{ border-color:var(--blue); box-shadow:0 0 0 1px rgba(88,166,255,.2); }}
+    .repo-card-title {{ font-weight:600; font-size:.875rem; }}
+    .repo-card-title a {{ color:var(--blue); text-decoration:none; }}
+    .repo-card-title a:hover {{ text-decoration:underline; }}
+    .repo-card-desc {{ color:var(--muted); font-size:.775rem; line-height:1.45; flex:1; }}
+    .repo-card-lang {{ display:flex; align-items:center; gap:.3rem; font-size:.75rem; color:var(--muted); }}
+    .lang-circle {{ width:10px; height:10px; border-radius:50%; flex-shrink:0; background:var(--orange); }}
+    .repo-card-stats {{ display:flex; flex-wrap:wrap; gap:.6rem; font-size:.75rem; color:var(--muted); }}
+    .repo-card-stats span {{ display:flex; align-items:center; gap:.2rem; }}
+    .repo-card-topics {{ display:flex; flex-wrap:wrap; gap:.3rem; }}
+    .topic {{ background:rgba(88,166,255,.1); color:var(--blue); border-radius:20px; padding:.1rem .45rem; font-size:.68rem; }}
 
-    .mb-1 {{ margin-bottom: 1rem; }}
-    .footer {{ text-align: center; color: var(--muted); font-size: 0.75rem; padding: 2rem 0 1rem; }}
-    .footer a {{ color: var(--blue); text-decoration: none; }}
+    /* ── Footer ── */
+    .footer {{ text-align:center; color:var(--muted); font-size:.72rem; padding:2rem 0 1rem; }}
+    .footer a {{ color:var(--blue); text-decoration:none; }}
   </style>
 </head>
 <body>
 
 <header class="header">
-  <span class="header-logo">📊</span>
-  <h1>{owner} · GitEternal Statistics</h1>
+  {'<img class="header-avatar" src="' + avatar + '" alt="' + owner + '">' if avatar else '<div class="header-avatar-placeholder">👤</div>'}
+  <div class="header-info">
+    <h1>{owner} · GitHub Statistics</h1>
+    <div class="sub">{'📍 ' + location if location else ''}</div>
+  </div>
   <div class="header-meta">
     Updated: <span id="generated-at"></span>
   </div>
@@ -441,45 +361,74 @@ def _render_html(
 
 <main class="main">
 
-  <!-- Summary strip -->
-  <div class="summary-grid" id="summary-strip"></div>
-
-  <!-- Activity chart -->
-  <div class="card mb-1">
-    <div class="card-header">Activity — last 365 days</div>
-    <div class="card-body">
-      <div class="chart-wrap">
-        <canvas id="activityChart"></canvas>
+  <!-- Profile card -->
+  <div class="profile-card">
+    {'<img class="profile-avatar" src="' + avatar + '" alt="' + owner + '">' if avatar else '<div class="profile-avatar-ph">👤</div>'}
+    <div class="profile-details">
+      <h2>{owner}</h2>
+      {'<div class="bio">' + bio + '</div>' if bio else ''}
+      <div class="profile-meta">
+        {'<span>📍 ' + location + '</span>' if location else ''}
+        <span id="prof-followers"></span>
+        <span id="prof-following"></span>
+        <span id="prof-repos"></span>
       </div>
-      <div style="display:flex;gap:1.5rem;font-size:0.75rem;color:var(--muted);margin-top:.5rem;">
-        <span><span style="display:inline-block;width:10px;height:10px;background:var(--blue);border-radius:2px;margin-right:4px;"></span>Clones</span>
-        <span><span style="display:inline-block;width:10px;height:10px;background:var(--green);border-radius:2px;margin-right:4px;"></span>Views</span>
+    </div>
+    {'<div class="profile-links"><a href="' + blog + '" target="_blank">🔗 ' + blog + '</a></div>' if blog else ''}
+  </div>
+
+  <!-- Stat strip -->
+  <div class="stat-grid" id="stat-strip"></div>
+
+  <!-- Activity chart + Language breakdown -->
+  <div class="grid-2 mb">
+    <div class="card">
+      <div class="card-header">📈 Activity — last 365 days</div>
+      <div class="card-body">
+        <div class="chart-wrap"><canvas id="activityChart"></canvas></div>
+        <div class="chart-legend">
+          <span><span class="legend-dot" style="background:var(--blue)"></span>Clones</span>
+          <span><span class="legend-dot" style="background:var(--green)"></span>Views</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">🌐 Language Breakdown</div>
+      <div class="card-body">
+        <div class="lang-bar-wrap">
+          <div class="lang-bar" id="lang-bar"></div>
+          <div class="lang-legend" id="lang-legend"></div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Repo cards -->
-  <div class="repos-section">
-    <div class="card-header">Repositories</div>
-    <div class="repo-cards" id="repo-cards"></div>
-  </div>
+  <div class="repos-header">📦 Repositories</div>
+  <div class="repo-cards" id="repo-cards"></div>
 
-  <!-- Trends table -->
-  <div class="card mb-1">
-    <div class="card-header">Week-over-Week Trends</div>
-    <div class="card-body" style="padding:0;">
-      <div class="table-wrap">
-        <table id="trends-table">
-          <thead>
-            <tr>
-              <th>Repository</th>
-              <th>This Week</th>
-              <th>Last Week</th>
-              <th>Change</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+  <!-- Trends + Top by clones -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">🔥 Week-over-Week Trends</div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table id="trends-table">
+            <thead><tr><th>Repository</th><th>This Week</th><th>Last Week</th><th>Δ</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">⭐ Top by Stars</div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table id="stars-table">
+            <thead><tr><th>#</th><th>Repository</th><th>Stars</th><th>Forks</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -487,221 +436,183 @@ def _render_html(
 </main>
 
 <footer class="footer">
-  Powered by <a href="https://github.com/{owner}/GitEternal" target="_blank">GitEternal_v2</a>
-  — data stored privately, dashboard auto-generated weekly.
+  Powered by <a href="https://github.com/{owner}/GitEternal" target="_blank">GitEternal</a>
+  · Data stored privately · Dashboard auto-generated weekly
 </footer>
 
-<!-- Inline data (no external fetches needed) -->
 <script>
-const SUMMARY    = {summary_json};
-const TOP_REPOS  = {top_repos_json};
-const TRENDS     = {trends_json};
-const CHART_DATA = {chart_data_json};
+const SUMMARY     = {summary_json};
+const TOP_REPOS   = {top_repos_json};
+const TRENDS      = {trends_json};
+const CHART_DATA  = {chart_data_json};
+const OWNER_STATS = {owner_stats_json};
 
-// ── Utilities ─────────────────────────────────────────────────────────────────
-function fmt(n) {{
-  if (n === null || n === undefined) return '—';
-  return Number(n).toLocaleString();
-}}
+const LANG_COLORS = {{
+  'Python':'#3572A5','JavaScript':'#f1e05a','TypeScript':'#2b7489','Java':'#b07219',
+  'C++':'#f34b7d','C':'#555555','Go':'#00ADD8','Rust':'#dea584','Ruby':'#701516',
+  'PHP':'#4F5D95','Shell':'#89e051','Kotlin':'#F18E33','Swift':'#ffac45',
+  'HTML':'#e34c26','CSS':'#563d7c','Dart':'#00B4AB','Scala':'#c22d40',
+  'Vue':'#41b883','C#':'#178600','R':'#198CE7','Jupyter Notebook':'#DA5B0B',
+}};
+
+function fmt(n) {{ return n == null ? '—' : Number(n).toLocaleString(); }}
 function fmtPct(v) {{
-  if (v === null || v === undefined) return '<span class="badge badge-flat">—</span>';
-  const sign = v >= 0 ? '+' : '';
-  const cls  = v > 0 ? 'badge-up' : v < 0 ? 'badge-down' : 'badge-flat';
-  return `<span class="badge ${{cls}}">${{sign}}${{v}}%</span>`;
+  if (v == null) return '<span class="badge badge-flat">—</span>';
+  const s = v >= 0 ? '+' : ''; const c = v > 0 ? 'badge-up' : v < 0 ? 'badge-down' : 'badge-flat';
+  return `<span class="badge ${{c}}">${{s}}${{v}}%</span>`;
 }}
 
-// ── Summary strip ─────────────────────────────────────────────────────────────
-function renderSummary() {{
-  const el = document.getElementById('summary-strip');
+// ── Stat strip ──────────────────────────────────────────────────────────────
+function renderStats() {{
   const stats = [
-    {{ label: 'Tracked Repos',   value: fmt(SUMMARY.total_repos),    sub: '' }},
-    {{ label: 'Lifetime Clones', value: fmt(SUMMARY.lifetime_clones), sub: 'all time' }},
-    {{ label: 'Unique Cloners',  value: fmt(SUMMARY.lifetime_uniques), sub: 'all time' }},
-    {{ label: 'Most Active Repo',
-       value: SUMMARY.most_active_repo
-                ? SUMMARY.most_active_repo.split('/')[1]
-                : '—',
-       sub: SUMMARY.most_active_repo
-              ? SUMMARY.most_active_repo.split('/')[0]
-              : '' }},
+    {{ label:'Public Repos',    value:fmt(SUMMARY.total_repos),         sub:'tracked',     icon:'📦', color:'var(--blue)'   }},
+    {{ label:'Total Stars',     value:fmt(SUMMARY.total_stars),         sub:'across repos', icon:'⭐', color:'var(--yellow)' }},
+    {{ label:'Total Forks',     value:fmt(SUMMARY.total_forks),         sub:'across repos', icon:'🍴', color:'var(--green)'  }},
+    {{ label:'Lifetime Clones', value:fmt(SUMMARY.lifetime_clones),     sub:'all time',    icon:'📥', color:'var(--purple)' }},
+    {{ label:'Unique Cloners',  value:fmt(SUMMARY.lifetime_uniques),    sub:'all time',    icon:'👤', color:'var(--orange)' }},
+    {{ label:'Total Commits',   value:fmt(OWNER_STATS.total_commits),   sub:'all time',    icon:'💻', color:'var(--green)'  }},
+    {{ label:'Total PRs',       value:fmt(OWNER_STATS.total_prs),       sub:'all time',    icon:'🔀', color:'var(--blue)'   }},
+    {{ label:'Followers',       value:fmt(OWNER_STATS.followers),       sub:'on GitHub',   icon:'👥', color:'var(--purple)' }},
   ];
-  el.innerHTML = stats.map(s => `
-    <div class="stat-card">
+  document.getElementById('stat-strip').innerHTML = stats.map(s => `
+    <div class="stat-card" style="--accent-color:${{s.color}}">
       <div class="stat-label">${{s.label}}</div>
       <div class="stat-value">${{s.value}}</div>
-      ${{s.sub ? `<div class="stat-sub">${{s.sub}}</div>` : ''}}
-    </div>
-  `).join('');
+      <div class="stat-sub">${{s.sub}}</div>
+      <div class="stat-icon">${{s.icon}}</div>
+    </div>`).join('');
+
+  // Profile meta
+  if (OWNER_STATS.followers) document.getElementById('prof-followers').textContent = `👥 ${{fmt(OWNER_STATS.followers)}} followers`;
+  if (OWNER_STATS.following) document.getElementById('prof-following').textContent = `· ${{fmt(OWNER_STATS.following)}} following`;
+  if (OWNER_STATS.public_repos) document.getElementById('prof-repos').textContent = `· ${{fmt(OWNER_STATS.public_repos)}} public repos`;
 
   const genAt = document.getElementById('generated-at');
-  if (SUMMARY.generated_at) {{
-    genAt.textContent = new Date(SUMMARY.generated_at).toLocaleString();
-  }}
+  if (SUMMARY.generated_at) genAt.textContent = new Date(SUMMARY.generated_at).toLocaleString();
 }}
 
-// ── Repo cards ─────────────────────────────────────────────────────────────────
+// ── Language bar ────────────────────────────────────────────────────────────
+function renderLangBar() {{
+  const langs = SUMMARY.language_breakdown || {{}};
+  const total = Object.values(langs).reduce((a,b) => a+b, 0);
+  if (!total) return;
+  const sorted = Object.entries(langs).sort((a,b) => b[1]-a[1]);
+  const bar = document.getElementById('lang-bar');
+  const legend = document.getElementById('lang-legend');
+  bar.innerHTML = sorted.map(([lang, count]) => {{
+    const pct = (count / total * 100).toFixed(1);
+    const color = LANG_COLORS[lang] || 'var(--muted)';
+    return `<div class="lang-bar-seg" style="flex:${{pct}};background:${{color}}" title="${{lang}} ${{pct}}%"></div>`;
+  }}).join('');
+  legend.innerHTML = sorted.slice(0, 10).map(([lang, count]) => {{
+    const pct = (count / total * 100).toFixed(1);
+    const color = LANG_COLORS[lang] || 'var(--muted)';
+    return `<div class="lang-legend-item"><span class="lang-dot" style="background:${{color}}"></span>${{lang}} ${{pct}}%</div>`;
+  }}).join('');
+}}
+
+// ── Repo cards ───────────────────────────────────────────────────────────────
 function renderRepoCards() {{
   const container = document.getElementById('repo-cards');
   if (!container || !TOP_REPOS.length) return;
-
-  const langColors = {{
-    'Python':'#3572A5','JavaScript':'#f1e05a','TypeScript':'#2b7489','Java':'#b07219',
-    'C++':'#f34b7d','C':'#555555','Go':'#00ADD8','Rust':'#dea584','Ruby':'#701516',
-    'PHP':'#4F5D95','Shell':'#89e051','Kotlin':'#F18E33','Swift':'#ffac45',
-    'HTML':'#e34c26','CSS':'#563d7c','Dart':'#00B4AB','Scala':'#c22d40',
-    'Vue':'#2c3e50','C#':'#178600',
-  }};
-
   container.innerHTML = TOP_REPOS.map(r => {{
     const [, repo] = r.repo.split('/');
-    const desc  = r.description ? `<div class="repo-card-desc">${{r.description}}</div>` : '';
-    const lang  = r.language
-      ? `<div class="repo-card-lang">
-           <span class="lang-dot" style="background:${{langColors[r.language] || 'var(--muted)'}};"></span>
-           ${{r.language}}
-         </div>`
-      : '';
-    const topics = r.topics && r.topics.length
-      ? `<div class="repo-card-topics">${{r.topics.slice(0,4).map(t => `<span class="topic-tag">${{t}}</span>`).join('')}}</div>`
-      : '';
-    return `
-      <div class="repo-card">
-        <div class="repo-card-title">
-          <a href="https://github.com/${{r.repo}}" target="_blank">${{repo}}</a>
-        </div>
-        ${{desc}}
-        ${{lang}}
-        <div class="repo-card-meta">
-          <span>⭐ ${{fmt(r.stars)}}</span>
-          <span>🍴 ${{fmt(r.forks)}}</span>
-          <span>👁 ${{fmt(r.watchers)}}</span>
-          <span>🔵 ${{fmt(r.lifetime_clones)}} clones</span>
-          ${{r.open_issues ? `<span>⚠ ${{r.open_issues}} issues</span>` : ''}}
-        </div>
-        ${{topics}}
-      </div>`;
+    const desc   = r.description ? `<div class="repo-card-desc">${{r.description}}</div>` : '';
+    const lang   = r.language ? `<div class="repo-card-lang"><span class="lang-circle" style="background:${{LANG_COLORS[r.language]||'var(--muted)'}}"></span>${{r.language}}</div>` : '';
+    const topics = r.topics?.length ? `<div class="repo-card-topics">${{r.topics.slice(0,3).map(t=>`<span class="topic">${{t}}</span>`).join('')}}</div>` : '';
+    return `<div class="repo-card">
+      <div class="repo-card-title"><a href="https://github.com/${{r.repo}}" target="_blank">${{repo}}</a></div>
+      ${{desc}}${{lang}}
+      <div class="repo-card-stats">
+        <span>⭐ ${{fmt(r.stars)}}</span>
+        <span>🍴 ${{fmt(r.forks)}}</span>
+        <span>👁 ${{fmt(r.watchers)}}</span>
+        <span>📥 ${{fmt(r.lifetime_clones)}}</span>
+        ${{r.open_issues ? `<span>⚠ ${{r.open_issues}}</span>` : ''}}
+      </div>
+      ${{topics}}
+    </div>`;
   }}).join('');
 }}
 
-// ── Trends table ──────────────────────────────────────────────────────────────
+// ── Trends table ─────────────────────────────────────────────────────────────
 function renderTrends() {{
-  const tbody = document.querySelector('#trends-table tbody');
-  tbody.innerHTML = TRENDS.slice(0, 15).map(r => {{
-    const [, repo] = r.repo.split('/');
-    return `<tr>
-      <td><a class="repo-link" href="https://github.com/${{r.repo}}" target="_blank">${{repo}}</a></td>
-      <td>${{fmt(r.current_week_clones)}}</td>
-      <td>${{fmt(r.prior_week_clones)}}</td>
-      <td>${{fmtPct(r.clone_delta_pct)}}</td>
-    </tr>`;
-  }}).join('');
+  document.querySelector('#trends-table tbody').innerHTML =
+    TRENDS.slice(0,15).map(r => {{
+      const [,repo] = r.repo.split('/');
+      return `<tr>
+        <td><a class="repo-link" href="https://github.com/${{r.repo}}" target="_blank">${{repo}}</a></td>
+        <td>${{fmt(r.current_week_clones)}}</td>
+        <td>${{fmt(r.prior_week_clones)}}</td>
+        <td>${{fmtPct(r.clone_delta_pct)}}</td>
+      </tr>`;
+    }}).join('');
 }}
 
-// ── Activity chart (pure canvas, no library) ──────────────────────────────────
+// ── Top by stars table ───────────────────────────────────────────────────────
+function renderStarsTable() {{
+  const sorted = [...TOP_REPOS].sort((a,b) => (b.stars||0)-(a.stars||0));
+  document.querySelector('#stars-table tbody').innerHTML =
+    sorted.slice(0,15).map((r,i) => {{
+      const [,repo] = r.repo.split('/');
+      return `<tr>
+        <td style="color:var(--muted)">${{i+1}}</td>
+        <td><a class="repo-link" href="https://github.com/${{r.repo}}" target="_blank">${{repo}}</a></td>
+        <td>⭐ ${{fmt(r.stars)}}</td>
+        <td>🍴 ${{fmt(r.forks)}}</td>
+      </tr>`;
+    }}).join('');
+}}
+
+// ── Activity chart ───────────────────────────────────────────────────────────
 function renderChart() {{
   const canvas = document.getElementById('activityChart');
   if (!canvas || !CHART_DATA.length) return;
-
   const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.parentElement.getBoundingClientRect();
-  const W = rect.width;
-  const H = 200;
-  canvas.width  = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.width  = W + 'px';
-  canvas.style.height = H + 'px';
-
+  const W = canvas.parentElement.getBoundingClientRect().width;
+  const H = 180;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
-
-  const PAD = {{ top: 10, right: 16, bottom: 30, left: 44 }};
-  const CW  = W - PAD.left - PAD.right;
-  const CH  = H - PAD.top  - PAD.bottom;
-
-  const clones = CHART_DATA.map(d => d.clones);
-  const views  = CHART_DATA.map(d => d.views);
-  const maxVal = Math.max(...clones, ...views, 1);
-  const n      = CHART_DATA.length;
-  const step   = CW / Math.max(n - 1, 1);
-
-  function xOf(i) {{ return PAD.left + i * step; }}
-  function yOf(v) {{ return PAD.top  + CH - (v / maxVal) * CH; }}
-
-  // Grid lines
-  ctx.strokeStyle = '#21262d';
-  ctx.lineWidth   = 1;
+  const PAD = {{ top:10, right:16, bottom:30, left:44 }};
+  const gW = W - PAD.left - PAD.right;
+  const gH = H - PAD.top  - PAD.bottom;
+  const maxC = Math.max(...CHART_DATA.map(d=>d.clones), 1);
+  const maxV = Math.max(...CHART_DATA.map(d=>d.views),  1);
+  const maxY = Math.max(maxC, maxV);
+  const xStep = gW / Math.max(CHART_DATA.length - 1, 1);
+  function px(i, val) {{ return [PAD.left + i * xStep, PAD.top + gH - (val / maxY) * gH]; }}
+  // Grid
+  ctx.strokeStyle = 'rgba(48,54,61,.8)'; ctx.lineWidth = 1;
   for (let t = 0; t <= 4; t++) {{
-    const y = PAD.top + (CH / 4) * t;
-    ctx.beginPath();
-    ctx.moveTo(PAD.left, y);
-    ctx.lineTo(PAD.left + CW, y);
+    const y = PAD.top + (gH / 4) * t;
+    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + gW, y); ctx.stroke();
+  }}
+  function drawLine(color, key) {{
+    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+    CHART_DATA.forEach((d,i) => {{ const [x,y] = px(i,d[key]); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); }});
     ctx.stroke();
   }}
-
-  // Y-axis labels
-  ctx.fillStyle  = '#8b949e';
-  ctx.font       = '11px system-ui';
-  ctx.textAlign  = 'right';
-  for (let t = 0; t <= 4; t++) {{
-    const v = Math.round(maxVal * (1 - t / 4));
-    const y = PAD.top + (CH / 4) * t + 4;
-    ctx.fillText(v >= 1000 ? (v/1000).toFixed(1)+'k' : v, PAD.left - 6, y);
-  }}
-
-  // X-axis labels (roughly monthly)
-  ctx.textAlign = 'center';
-  const labelStep = Math.max(1, Math.round(n / 6));
-  for (let i = 0; i < n; i += labelStep) {{
-    const d   = CHART_DATA[i].date;
-    const lbl = d.slice(5, 7) + '/' + d.slice(2, 4);
-    ctx.fillText(lbl, xOf(i), H - 8);
-  }}
-
-  // Area fill + line — views
-  const gv = ctx.createLinearGradient(0, PAD.top, 0, PAD.top + CH);
-  gv.addColorStop(0, 'rgba(63,185,80,.25)');
-  gv.addColorStop(1, 'rgba(63,185,80,0)');
-  ctx.beginPath();
-  ctx.moveTo(xOf(0), yOf(views[0]));
-  for (let i = 1; i < n; i++) ctx.lineTo(xOf(i), yOf(views[i]));
-  ctx.lineTo(xOf(n-1), PAD.top + CH);
-  ctx.lineTo(xOf(0),   PAD.top + CH);
-  ctx.closePath();
-  ctx.fillStyle = gv;
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(xOf(0), yOf(views[0]));
-  for (let i = 1; i < n; i++) ctx.lineTo(xOf(i), yOf(views[i]));
-  ctx.strokeStyle = '#3fb950';
-  ctx.lineWidth   = 1.5;
-  ctx.stroke();
-
-  // Area fill + line — clones
-  const gc = ctx.createLinearGradient(0, PAD.top, 0, PAD.top + CH);
-  gc.addColorStop(0, 'rgba(88,166,255,.3)');
-  gc.addColorStop(1, 'rgba(88,166,255,0)');
-  ctx.beginPath();
-  ctx.moveTo(xOf(0), yOf(clones[0]));
-  for (let i = 1; i < n; i++) ctx.lineTo(xOf(i), yOf(clones[i]));
-  ctx.lineTo(xOf(n-1), PAD.top + CH);
-  ctx.lineTo(xOf(0),   PAD.top + CH);
-  ctx.closePath();
-  ctx.fillStyle = gc;
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(xOf(0), yOf(clones[0]));
-  for (let i = 1; i < n; i++) ctx.lineTo(xOf(i), yOf(clones[i]));
-  ctx.strokeStyle = '#58a6ff';
-  ctx.lineWidth   = 2;
-  ctx.stroke();
+  drawLine('#58a6ff','clones'); drawLine('#3fb950','views');
+  // X labels (monthly)
+  ctx.fillStyle = '#8b949e'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+  const step = Math.max(1, Math.floor(CHART_DATA.length / 6));
+  CHART_DATA.forEach((d,i) => {{
+    if (i % step === 0) {{
+      const [x] = px(i,0);
+      ctx.fillText(d.date.slice(0,7), x, H - 8);
+    }}
+  }});
+  // Y label
+  ctx.textAlign = 'right'; ctx.fillText(fmt(maxY), PAD.left - 4, PAD.top + 4);
 }}
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
-renderSummary();
+renderStats();
+renderLangBar();
 renderRepoCards();
 renderTrends();
+renderStarsTable();
 renderChart();
 window.addEventListener('resize', renderChart);
 </script>
@@ -727,6 +638,10 @@ def generate(vault_path: Path, output_path: Path, owner: str | None = None) -> N
     trends     = _generate_trends(vault_path, index)
     chart_data = _collect_chart_data(vault_path, index)
 
+    # Load owner stats if available
+    owner_stats_path = vault_path / "owner_stats.json"
+    owner_stats = json.loads(owner_stats_path.read_text()) if owner_stats_path.exists() else {}
+
     # Write reports
     reports_dir = output_path / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
@@ -739,13 +654,13 @@ def generate(vault_path: Path, output_path: Path, owner: str | None = None) -> N
     # Write dashboard HTML
     docs_dir = output_path / "docs"
     docs_dir.mkdir(parents=True, exist_ok=True)
-    html = _render_html(summary, top_repos, trends, chart_data, owner)
+    html = _render_html(summary, top_repos, trends, chart_data, owner, owner_stats)
     (docs_dir / "index.html").write_text(html)
     logger.info("Dashboard written to %s/docs/index.html", output_path)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate GitEternal_v2 statistics reports")
+    parser = argparse.ArgumentParser(description="Generate GitEternal statistics reports")
     parser.add_argument("--vault",  required=True, help="Path to GitData clone")
     parser.add_argument("--output", required=True, help="Path to write output files")
     parser.add_argument("--owner",  default=None,  help="GitHub owner login (auto-detected if omitted)")

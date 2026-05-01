@@ -8,7 +8,7 @@ Environment variables
   HARVEST_TOKEN           — classic PAT with 'repo' scope (YOUR GitHub account)
   VAULT_TOKEN             — write-access token for GitData repo
                             (falls back to HARVEST_TOKEN if not set)
-                            In the new workflow this is GIT_ETERNAL_DATA_TOKEN,
+                            In the new workflow this is ACTIONS_TOKEN,
                             but the env var is mapped as VAULT_TOKEN in the step.
   VAULT_REPO              — full name of the data repo  e.g. alice/GitData
 """
@@ -27,14 +27,14 @@ from typing import Any
 
 import httpx
 
-from .api import check_rate_limit, fetch_clones, fetch_referrers, fetch_repo_info, fetch_views
+from .api import check_rate_limit, fetch_clones, fetch_owner_stats, fetch_referrers, fetch_repo_info, fetch_views
 from .lock import acquire_lock, release_lock
 from .merge import merge_month, update_index
 from .schema import HarvestLog, HarvestRun, MonthLedger, VaultIndex
 
 logger = logging.getLogger(__name__)
 
-VAULT_BRANCH = "gitdata"
+VAULT_BRANCH = os.environ.get("VAULT_BRANCH", "gitdata")
 BOT_NAME     = "github-actions[bot]"
 BOT_EMAIL    = "github-actions[bot]@users.noreply.github.com"
 
@@ -94,7 +94,7 @@ def _append_log(vault_path: Path, run: HarvestRun) -> None:
 def _gh_headers(token: str) -> dict[str, str]:
     return {
         "Authorization": f"Bearer {token}",
-        "User-Agent": "GitEternal_v2/1.0",
+        "User-Agent": "GitEternal/1.0",
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
     }
@@ -350,6 +350,15 @@ async def main() -> None:
                         repo_errors.append(f"{full_repo}: {exc}")
 
             _write_json(index_path, index.model_dump(mode="json"))
+
+            # Fetch and store owner-level stats (commits, PRs, issues, profile)
+            try:
+                owner_stats = await fetch_owner_stats(owner_login, harvest_token, client=client)
+                owner_stats["harvested_at"] = datetime.now(tz=UTC).isoformat()
+                _write_json(vault_path / "owner_stats.json", owner_stats)
+                logger.info("Owner stats: %s", owner_stats)
+            except Exception as exc:
+                logger.warning("Could not fetch owner stats: %s", exc)
 
             status = "success"
             if repo_errors and harvested:   status = "partial_failure"

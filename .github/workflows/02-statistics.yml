@@ -1,16 +1,14 @@
-name: "02 · Generate Statistics & Deploy Pages"
+name: "02 · Generate Statistics & Deploy Site"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Reads GitData, generates analytics reports and a GitHub Pages
-# dashboard, then pushes everything to My-Git-Statistics.
+# Reads the gitdata branch → generates dashboard HTML → pushes to site branch.
+# GitHub Pages serves the site branch (root folder).
 #
 # Triggered automatically after a successful harvest, or manually.
 #
 # Required secrets:
-#   GIT_ETERNAL_DATA_TOKEN  — fine-grained PAT, contents:read on GitData
-#   GIT_ETERNAL_DATA_REPO   — owner/GitData
-#   GIT_STATISTICS_TOKEN    — fine-grained PAT, contents:write on My-Git-Statistics
-#   GIT_STATISTICS_REPO     — owner/My-Git-Statistics
+#   HARVEST_TOKEN  — classic PAT with 'repo' scope  (reads gitdata)
+#   ACTIONS_TOKEN  — classic PAT with 'repo'+'workflow' (writes to site)
 # ─────────────────────────────────────────────────────────────────────────────
 
 on:
@@ -24,21 +22,22 @@ permissions:
 
 jobs:
   statistics:
-    # Only run if the harvester succeeded (or if manually dispatched)
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
     steps:
-      - name: Checkout source repo
+      - name: Checkout main (engine code)
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install Python dependencies
+      - name: Install dependencies
         run: pip install -r packages/engine/requirements.txt
 
       - name: Configure git identity
@@ -46,78 +45,72 @@ jobs:
           git config --global user.name  "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Clone GitData (read-only)
+      - name: Clone gitdata branch (read)
         env:
-          DATA_TOKEN: ${{ secrets.HARVEST_TOKEN }}
-          DATA_REPO:  ${{ secrets.GIT_ETERNAL_DATA_REPO }}
+          HARVEST_TOKEN: ${{ secrets.HARVEST_TOKEN }}
         run: |
           git clone \
             --branch gitdata \
             --depth 1 \
-            "https://x-access-token:${DATA_TOKEN}@github.com/${DATA_REPO}.git" \
+            "https://x-access-token:${HARVEST_TOKEN}@github.com/${{ github.repository }}.git" \
             /tmp/vault
-          echo "✅  Cloned vault: $(ls /tmp/vault)"
+          echo "✅  Vault cloned: $(ls /tmp/vault)"
 
-      - name: Generate statistics reports + HTML
-        env:
-          GIT_STATISTICS_REPO: ${{ secrets.GIT_STATISTICS_REPO }}
+      - name: Generate statistics + dashboard HTML
         run: |
           python -m packages.engine.statistics \
             --vault  /tmp/vault \
             --output /tmp/stats-output
-          echo "✅  Generated output:"
+          echo "✅  Generated:"
           ls -lh /tmp/stats-output/
 
-      - name: Clone My-Git-Statistics (write)
+      - name: Clone site branch (write)
         env:
-          STATS_TOKEN: ${{ secrets.HARVEST_TOKEN }}
-          STATS_REPO:  ${{ secrets.GIT_STATISTICS_REPO }}
+          ACTIONS_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         run: |
           git clone \
-            --branch main \
+            --branch site \
             --depth 1 \
-            "https://x-access-token:${STATS_TOKEN}@github.com/${STATS_REPO}.git" \
-            /tmp/My-Git-Statistics
+            "https://x-access-token:${ACTIONS_TOKEN}@github.com/${{ github.repository }}.git" \
+            /tmp/site
+          echo "✅  Site branch cloned"
 
-      - name: Copy reports and dashboard into My-Git-Statistics
+      - name: Copy dashboard into site branch
         run: |
-          # Reports (JSON) — consumed by dashboard JS
-          mkdir -p /tmp/My-Git-Statistics/reports
-          cp /tmp/stats-output/reports/*.json /tmp/My-Git-Statistics/reports/
+          # Dashboard HTML — served at root by GitHub Pages
+          cp /tmp/stats-output/docs/index.html /tmp/site/index.html
 
-          # Dashboard HTML
-          mkdir -p /tmp/My-Git-Statistics/docs
-          cp /tmp/stats-output/docs/index.html /tmp/My-Git-Statistics/docs/index.html
+          # JSON reports — referenced by the dashboard JS
+          mkdir -p /tmp/site/reports
+          cp /tmp/stats-output/reports/*.json /tmp/site/reports/
 
-          echo "✅  Files copied"
-          ls -lh /tmp/My-Git-Statistics/reports/
-          ls -lh /tmp/My-Git-Statistics/docs/
+          echo "✅  Files staged:"
+          ls -lh /tmp/site/
 
-      - name: Commit and push to My-Git-Statistics
+      - name: Commit and push to site branch
         env:
-          STATS_TOKEN: ${{ secrets.HARVEST_TOKEN }}
-          STATS_REPO:  ${{ secrets.GIT_STATISTICS_REPO }}
+          ACTIONS_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         run: |
-          cd /tmp/My-Git-Statistics
+          cd /tmp/site
           git add -A
 
           if git diff --cached --quiet; then
-            echo "Nothing to commit — statistics unchanged"
+            echo "Nothing changed — skipping commit"
             exit 0
           fi
 
           DATESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
-          git commit -m "stats: update analytics dashboard ${DATESTAMP} [skip ci]"
+          git commit -m "site: update dashboard ${DATESTAMP} [skip ci]"
 
-          REMOTE="https://x-access-token:${STATS_TOKEN}@github.com/${STATS_REPO}.git"
-          git push "$REMOTE" HEAD:main
-          echo "✅  Pushed statistics dashboard"
+          git push \
+            "https://x-access-token:${ACTIONS_TOKEN}@github.com/${{ github.repository }}.git" \
+            "HEAD:site"
+
+          echo "✅  Site branch updated"
 
       - name: Print dashboard URL
-        env:
-          STATS_REPO: ${{ secrets.GIT_STATISTICS_REPO }}
         run: |
-          OWNER=$(echo "$STATS_REPO" | cut -d'/' -f1)
-          REPO=$(echo  "$STATS_REPO" | cut -d'/' -f2)
+          OWNER=$(echo "${{ github.repository }}" | cut -d'/' -f1)
+          REPO=$(echo  "${{ github.repository }}" | cut -d'/' -f2)
           echo ""
-          echo "📊 Dashboard updated: https://${OWNER}.github.io/${REPO}"
+          echo "📊 Dashboard: https://${OWNER}.github.io/${REPO}"

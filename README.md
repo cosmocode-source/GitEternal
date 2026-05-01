@@ -8,12 +8,12 @@
 <br /><br />
 
 ```
-           ██████╗ ██╗████████╗███████╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗
-          ██╔════╝ ██║╚══██╔══╝██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║
-          ██║  ███╗██║   ██║   █████╗     ██║   █████╗  ██████╔╝██╔██╗ ██║███████║██║
-          ██║   ██║██║   ██║   ██╔══╝     ██║   ██╔══╝  ██╔══██╗██║╚██╗██║██╔══██║██║
-               ╚██████╔╝██║   ██║   ███████╗   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗
-                ╚═════╝ ╚═╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
+  ██████╗ ██╗████████╗███████╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗
+ ██╔════╝ ██║╚══██╔══╝██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║
+ ██║  ███╗██║   ██║   █████╗     ██║   █████╗  ██████╔╝██╔██╗ ██║███████║██║
+ ██║   ██║██║   ██║   ██╔══╝     ██║   ██╔══╝  ██╔══██╗██║╚██╗██║██╔══██║██║
+      ╚██████╔╝██║   ██║   ███████╗   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗
+       ╚═════╝ ╚═╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
 ```
 
 ### **Git as the database. GitHub as the infrastructure. Your data, forever.**
@@ -22,9 +22,9 @@
 
 <br />
 
-[![Harvest](https://img.shields.io/github/actions/workflow/status/cosmocode-source/GitEternal_v2/01-harvester.yml?label=Harvest&logo=github-actions&logoColor=white&style=flat-square)](https://github.com/cosmocode-source/GitEternal_v2/actions/workflows/01-harvester.yml)
-[![Statistics](https://img.shields.io/github/actions/workflow/status/cosmocode-source/GitEternal_v2/02-statistics.yml?label=Statistics&logo=github-actions&logoColor=white&style=flat-square)](https://github.com/cosmocode-source/GitEternal_v2/actions/workflows/02-statistics.yml)
-[![Dashboard](https://img.shields.io/badge/Dashboard-Live-brightgreen?style=flat-square&logo=github)](https://cosmocode-source.github.io/My-Git-Statistics)
+[![Harvest](https://img.shields.io/github/actions/workflow/status/YOUR_USERNAME/GitEternal/01-harvester.yml?label=Harvest&logo=github-actions&logoColor=white&style=flat-square)](https://github.com/YOUR_USERNAME/GitEternal/actions/workflows/01-harvester.yml)
+[![Statistics](https://img.shields.io/github/actions/workflow/status/YOUR_USERNAME/GitEternal/02-statistics.yml?label=Statistics&logo=github-actions&logoColor=white&style=flat-square)](https://github.com/YOUR_USERNAME/GitEternal/actions/workflows/02-statistics.yml)
+[![Dashboard](https://img.shields.io/badge/Dashboard-Live-brightgreen?style=flat-square&logo=github)](https://YOUR_USERNAME.github.io/My-Git-Statistics)
 
 </div>
 
@@ -36,7 +36,7 @@ GitHub's traffic API is powerful but brutally short-sighted — it only retains 
 
 ## The Solution
 
-GitEternal_v2 runs a weekly automated harvest *before* your data expires, commits it into a private Git repository that acts as a flat-file database, and builds a public GitHub Pages dashboard from aggregated reports — all without touching any infrastructure outside GitHub itself.
+GitEternal runs a weekly automated harvest *before* your data expires, commits it into a private Git repository that acts as a flat-file database, and builds a public GitHub Pages dashboard from aggregated reports — all without touching any infrastructure outside GitHub itself.
 
 No servers. No cloud databases. No subscription. No external credentials. Just Git.
 
@@ -44,48 +44,47 @@ No servers. No cloud databases. No subscription. No external credentials. Just G
 
 ## How It Works
 
+**One repo. Three branches. Fully isolated histories.**
+
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│                        YOUR GITHUB ACCOUNT                           │
+┌─────────────────────────────────────────────────────────────────────┐
+│                      GitEternal  (single repo)                      │
 │                                                                      │
-│  ┌─────────────────────┐      ┌────────────────────────┐            │
-│  │     GitEternal_v2      │      │   GitData     │ ← PRIVATE  │
-│  │     (this repo)     │─────▶│                        │            │
-│  │                     │      │  index.json            │            │
-│  │  packages/engine/   │      │  harvest_log.json      │            │
-│  │  .github/workflows/ │      │  config.json           │            │
-│  └─────────────────────┘      │  data/…/**/*.json      │            │
-│             │                 └────────────┬───────────┘            │
-│             │                              │                         │
-│             └──────────────────────────────┘                         │
-│                           reads vault                                │
-│                                │                                     │
-│                                ▼                                     │
-│                  ┌─────────────────────────────┐                    │
-│                  │    02-statistics workflow    │                    │
-│                  │  generates reports + HTML    │                    │
-│                  └──────────────┬──────────────┘                    │
-│                                 │ pushes                             │
-│                                 ▼                                    │
-│                    ┌────────────────────────┐                       │
-│                    │    My-Git-Statistics      │ ← PUBLIC              │
-│                    │                        │                       │
-│                    │  reports/*.json        │                       │
-│                    │  docs/index.html       │                       │
-│                    └───────────┬────────────┘                       │
-│                                │ GitHub Pages                        │
-└────────────────────────────────┼────────────────────────────────────┘
-                                 ▼
-             https://YOUR_USERNAME.github.io/My-Git-Statistics
+│  ┌──────────────────┐   push data    ┌──────────────────────────┐   │
+│  │   main branch    │ ─────────────▶ │   gitdata branch         │   │
+│  │                  │                │   (orphan — no shared    │   │
+│  │  packages/       │ ◀──────────── │    history with main)    │   │
+│  │  .github/        │   clone vault  │                          │   │
+│  │  workflows/      │                │  index.json              │   │
+│  │  README.md       │                │  harvest_log.json        │   │
+│  └──────────────────┘                │  config.json             │   │
+│          │                           │  owner_stats.json        │   │
+│          │                           │  data/{owner}/{repo}/    │   │
+│          │                           │    {year}/{YYYY-MM}.json │   │
+│          │                           └──────────────────────────┘   │
+│          │                                                           │
+│          │ generate + push site                                      │
+│          ▼                                                           │
+│  ┌──────────────────────────────────────────────────────────────┐   │
+│  │   site branch  (orphan — no shared history with main)        │   │
+│  │                                                              │   │
+│  │   index.html      ← full dashboard                          │   │
+│  │   reports/*.json  ← aggregated summaries                    │   │
+│  │   README.md                                                  │   │
+│  └──────────────────────────────────┬───────────────────────────┘  │
+│                                     │ GitHub Pages                   │
+└─────────────────────────────────────┼─────────────────────────────-─┘
+                                      ▼
+              https://YOUR_USERNAME.github.io/GitEternal
 ```
 
-**Three repos. Three responsibilities. One automated pipeline.**
+**One repo. Three responsibilities. Isolated histories.**
 
-| Repository | Visibility | Role |
-|---|---|---|
-| `GitEternal_v2` | Private | Engine code, workflow definitions, Python harvester |
-| `GitData` | **Private** | Raw traffic vault — daily clones, views, referrers per repo |
-| `My-Git-Statistics` | Public | Aggregated dashboard served via GitHub Pages |
+| Branch | Orphan | Visibility | Role |
+|--------|--------|------------|------|
+| `main` | No | Private | Engine code, workflows, Python harvester |
+| `gitdata` | **Yes** | Private (branch) | Raw traffic vault — daily JSON ledgers |
+| `site` | **Yes** | Public via Pages | Static dashboard HTML + JSON reports |
 
 ---
 
@@ -139,68 +138,45 @@ No servers. No cloud databases. No subscription. No external credentials. Just G
 ## Repository Structure
 
 ```
-GitEternal_v2/
+GitEternal/  (single repo)
 │
-├── .github/
-│   └── workflows/
-│       ├── 00-setup.yml          # One-time bootstrap — creates both repos, enables Pages, self-deletes
-│       ├── 01-harvester.yml      # Weekly: collect traffic from GitHub API → commit to vault
-│       └── 02-statistics.yml     # Weekly: read vault → generate reports → deploy dashboard
+├── [main branch] ──────────────────────────────────────────────────
+│   ├── .github/
+│   │   └── workflows/
+│   │       ├── 00-setup.yml        ← creates gitdata + site branches
+│   │       ├── 01-harvester.yml    ← harvests traffic → gitdata
+│   │       └── 02-statistics.yml   ← gitdata → generates HTML → site
+│   ├── packages/
+│   │   └── engine/
+│   │       ├── api.py              ← GitHub API calls
+│   │       ├── harvester.py        ← main harvest orchestrator
+│   │       ├── merge.py            ← deduplicating ledger merge logic
+│   │       ├── schema.py           ← Pydantic v2 data models
+│   │       ├── statistics.py       ← report + HTML dashboard generator
+│   │       ├── lock.py             ← distributed harvest lock
+│   │       ├── requirements.txt
+│   │       └── tests/
+│   └── README.md
 │
-├── packages/
-│   └── engine/
-│       ├── __init__.py
-│       ├── harvester.py          # Main entry point — discovers repos, runs harvest loop, manages lock
-│       ├── statistics.py         # Reads vault, generates JSON reports + self-contained HTML dashboard
-│       ├── api.py                # GitHub API wrappers: clones, views, referrers, rate limit
-│       ├── merge.py              # Time-series merge (dedup by date, sort ascending, gap detection)
-│       ├── schema.py             # Pydantic models: MonthLedger, VaultIndex, HarvestRun, etc.
-│       ├── lock.py               # Distributed mutex via harvest.lock file in vault
-│       ├── requirements.txt      # httpx, pydantic>=2, pytest, pytest-asyncio, ruff
-│       └── tests/
-│           ├── test_schema.py
-│           ├── test_merge.py
-│           └── test_gaps.py
+├── [gitdata branch — orphan] ──────────────────────────────────────
+│   ├── index.json                  ← lifetime stats per repo
+│   ├── harvest_log.json            ← last 50 harvest run records
+│   ├── config.json                 ← tracked repos config
+│   ├── owner_stats.json            ← GitHub profile + commit stats
+│   └── data/
+│       └── {owner}/
+│           └── {repo}/
+│               └── {year}/
+│                   └── {YYYY-MM}.json
 │
-├── docs/
-│   ├── PHASE1_ANALYSIS.md        # Architecture analysis of the original codebase
-│   └── PHASE2_DESIGN.md          # System design document for the new approach
-│
-└── README.md
+└── [site branch — orphan] ─────────────────────────────────────────
+    ├── index.html                  ← full dashboard (GitHub Pages root)
+    ├── reports/
+    │   ├── summary.json
+    │   ├── top_repos.json
+    │   └── trends.json
+    └── README.md
 ```
-
-### Vault structure (`GitData`, branch `GitData`)
-
-```
-GitData/
-│
-├── index.json            # VaultIndex: lifetime totals + available months per repo
-├── harvest_log.json      # HarvestLog: last 50 run records with status + errors
-├── config.json           # { "tracked_repos": ["owner/repo", ...] }
-├── harvest.lock          # Distributed mutex — auto-cleared after 2 hours if stale
-│
-└── data/
-    └── {owner}/
-        └── {repo}/
-            └── {year}/
-                └── {YYYY-MM}.json    # MonthLedger: daily clones, views, referrers + checksum
-```
-
-### Statistics structure (`My-Git-Statistics`, branch `main`)
-
-```
-My-Git-Statistics/
-│
-├── reports/
-│   ├── summary.json        # Portfolio totals: lifetime clones, uniques, most active repo
-│   ├── top_repos.json      # Repos ranked by lifetime clones
-│   ├── trends.json         # Week-over-week clone + view deltas per repo
-│   └── chart_data.json     # Daily aggregated activity for the last 365 days
-│
-└── docs/
-    └── index.html          # Self-contained dashboard — inline data, zero external deps
-```
-
 ---
 
 ## Data Schema
@@ -316,69 +292,54 @@ clone GitData (read-only, depth 1)
 
 Go to **GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)**
 
-Create a token with these scopes:
-- `repo` — full repository access
-- `workflow` — manage GitHub Actions workflows
+Create a token with scopes: `repo` + `workflow`
 
 ---
 
 ### Step 2 — Add `SETUP_TOKEN` secret
 
-In **this repo**: Settings → Secrets and variables → Actions → New repository secret
+**This repo** → Settings → Secrets and variables → Actions → New repository secret
 
 | Name | Value |
 |------|-------|
-| `SETUP_TOKEN` | The classic PAT you just created |
+| `SETUP_TOKEN` | The classic PAT from Step 1 |
 
 ---
 
 ### Step 3 — Run the setup workflow
 
-**Actions → "00 · Initial Setup" → Run workflow**
+**Actions → "00 · Setup Branches" → Run workflow**
 
-Wait ~2 minutes. The workflow creates both repos, enables Pages, prints what to do next, then deletes itself.
+This creates the `gitdata` and `site` orphan branches inside this repo, enables GitHub Pages from the `site` branch, and prints what to do next.
 
----
-
-### Step 4 — Create fine-grained PATs
-
-Go to **GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens**
-
-**Token A — for `GitData`**
-- Repository access: Only `GitData`
-- Permissions → Contents: **Read and write**
-
-**Token B — for `My-Git-Statistics`**
-- Repository access: Only `My-Git-Statistics`
-- Permissions → Contents: **Read and write**
+> During testing, open `00-setup.yml` and uncomment `if: false` on the last step to prevent self-deletion.
 
 ---
 
-### Step 5 — Add the remaining 3 secrets
+### Step 4 — Add the 2 operational secrets
 
-In **this repo**: Settings → Secrets and variables → Actions
+After setup completes, add these at **Settings → Secrets and variables → Actions**:
 
-| Secret | Value |
-|--------|-------|
-| `HARVEST_TOKEN` | Classic PAT with `repo` scope |
-| `GIT_ETERNAL_DATA_TOKEN` | Fine-grained PAT for `GitData` |
-| `GIT_STATISTICS_TOKEN` | Fine-grained PAT for `My-Git-Statistics` |
+| Secret | Type | Scopes | Purpose |
+|--------|------|--------|---------|
+| `HARVEST_TOKEN` | Classic PAT | `repo` | Calls GitHub traffic API + fetches your profile/commit stats |
+| `ACTIONS_TOKEN` | Classic PAT | `repo`, `workflow` | Writes to `gitdata` and `site` branches |
 
-> `GIT_ETERNAL_DATA_REPO` and `GIT_STATISTICS_REPO` were already set by the setup workflow.
+> `SETUP_TOKEN` can be the same PAT reused as `ACTIONS_TOKEN` if it has `repo` + `workflow` scopes.
 
 ---
 
-### Step 6 — First harvest
+### Step 5 — First harvest
 
 **Actions → "01 · Harvest Traffic Data" → Run workflow**
 
-The statistics workflow triggers automatically after. Dashboard goes live at:
+The `02 · Statistics` workflow triggers automatically after. Dashboard goes live at:
 
 ```
-https://YOUR_USERNAME.github.io/My-Git-Statistics
+https://YOUR_USERNAME.github.io/GitEternal
 ```
 
-> GitHub Pages can take up to 10 minutes on the very first deploy.
+> GitHub Pages can take up to 10 minutes on first deploy.
 
 ---
 
@@ -386,74 +347,107 @@ https://YOUR_USERNAME.github.io/My-Git-Statistics
 
 | Workflow | Schedule | Trigger |
 |----------|----------|---------|
-| Harvest | Every Sunday 06:00 UTC | `schedule` cron |
-| Statistics | After each successful harvest | `workflow_run` event |
+| 00 · Setup | Manual only | `workflow_dispatch` |
+| 01 · Harvest | Every Sunday 06:00 UTC | `schedule` cron + `workflow_dispatch` |
+| 02 · Statistics | After each successful harvest | `workflow_run` + `workflow_dispatch` |
 
-Both can also be triggered manually at any time from the Actions tab.
+Both 01 and 02 can be triggered manually at any time from the Actions tab.
+
 
 ---
 
 ## Token Reference
 
-| Secret | Type | Scopes / Permissions | Used For |
-|--------|------|---------------------|----------|
-| `SETUP_TOKEN` | Classic PAT | `repo`, `workflow` | One-time setup only |
-| `HARVEST_TOKEN` | Classic PAT | `repo` | Reading traffic API for all your repos |
-| `GIT_ETERNAL_DATA_TOKEN` | Fine-grained PAT | Contents: read/write on `GitData` | Writing harvested data to vault |
-| `GIT_STATISTICS_TOKEN` | Fine-grained PAT | Contents: read/write on `My-Git-Statistics` | Writing reports and dashboard HTML |
+| Secret | Type | Required Scopes | Used For |
+|--------|------|-----------------|----------|
+| `SETUP_TOKEN` | Classic PAT | `repo`, `workflow` | One-time branch creation + Pages setup |
+| `HARVEST_TOKEN` | Classic PAT | `repo` | GitHub traffic API, search API (commits/PRs/issues), user profile |
+| `ACTIONS_TOKEN` | Classic PAT | `repo`, `workflow` | Writing JSON to `gitdata` branch; writing HTML to `site` branch |
 
-**Why a classic PAT for `HARVEST_TOKEN`?**
-GitHub's traffic API requires either a classic PAT with `repo` scope, or a fine-grained PAT with "Repository traffic: Read" on *each individual repo*. For tracking many repos across multiple organizations, the classic PAT is significantly simpler.
+**Can I reuse one token for everything?**
+Yes — a single classic PAT with `repo` + `workflow` scopes works for all three secrets. Using separate tokens is better for security (principle of least privilege) but not required.
+
+**Why classic PATs and not fine-grained?**
+GitHub's traffic API requires either a classic PAT with `repo` scope, or a fine-grained PAT with "Repository traffic: Read" set per-repo. For tracking many repos, classic is simpler. Fine-grained tokens work fine for `ACTIONS_TOKEN` if you prefer.
+
+**What does `owner_stats.json` contain?**
+Total commit count, PR count, issue count, followers, and profile info fetched once per harvest via `/users/{owner}` and GitHub's search API. Stored privately in `gitdata`, used only for dashboard stat cards.
+
 
 ---
 
 ## Privacy Model
 
 ```
-Private (GitData)              Public (My-Git-Statistics)
-──────────────────────────────────────  ─────────────────────────────────────
+gitdata branch (private history)        site branch (public via Pages)
+────────────────────────────────────    ─────────────────────────────────────
 Exact daily clone counts                Lifetime clone totals per repo
 Exact daily view counts                 Lifetime unique cloner totals
-Referrer sources and counts             Week-over-week trend percentages
-Which repos you own                     Aggregated daily activity (last 365d)
-Harvest run history and errors          Most active repo name
+Referrer sources + counts               Week-over-week trend percentages
+Raw owner_stats.json                    Aggregated daily activity (last 12mo)
+Harvest run history + errors            Star/fork/watcher counts per repo
+Which repos you own                     Language breakdown + repo descriptions
 ```
 
-The public dashboard never exposes per-day breakdowns, referrer details, or harvest metadata. It shows the same kind of summary visible on any public GitHub repo's Insights tab.
+The `site` branch (and therefore the public dashboard) never exposes per-day breakdowns, referrer details, harvest metadata, or raw commit/PR/issue data. It shows the same kind of summary visible on any public GitHub profile.
+
+**Branch isolation:** `gitdata` and `site` are orphan branches — they share no git history with `main` or each other. You can delete either branch and recreate it without affecting the engine code on `main`.
+
 
 ---
+
+## Limitations & Edge Cases
+
+**GitHub Pages visibility**
+GitHub Pages on a private repo requires a paid plan (GitHub Pro/Teams). If your `GitEternal` repo is private, you have two options: (a) make the repo public, or (b) use a separate public repo for the site branch — the old multi-repo approach. The `site` branch content itself has no private data so making the repo public is safe.
+
+**Profile README auto-update**
+GitHub does not provide an API to update your profile README (`{username}/{username}`) from an external workflow without your PAT. GitEternal does not auto-update your profile README because that requires write access to a separate repo. Workaround: manually add this badge to your profile README once:
+```markdown
+[![Dashboard](https://img.shields.io/badge/Stats-Dashboard-blue?logo=github)](https://YOUR_USERNAME.github.io/GitEternal)
+```
+
+**Branch protection**
+If you have branch protection rules on `main`, the setup workflow's self-delete step may fail (it tries to delete a file directly on `main`). Solution: temporarily disable protection, or skip the self-delete step entirely by keeping `if: false` on that step.
+
+**Concurrent runs**
+The harvester uses a `harvest.lock` file in the `gitdata` branch to prevent concurrent runs. If a run is interrupted, the lock auto-expires after 2 hours. You can also delete `harvest.lock` directly from the `gitdata` branch via the GitHub UI.
+
+**First harvest timing**
+The `site` branch is initialized with a placeholder page. The real dashboard only appears after the first successful harvest + statistics run. This takes ~3–8 minutes depending on how many repos you have.
+
+**Re-running setup**
+The setup workflow checks if `gitdata` and `site` branches already exist before creating them — so re-running it is safe. It will skip existing branches and only create missing ones.
 
 ## Troubleshooting
 
 **Harvest returns 403 on some repos**
+The traffic API requires admin/push access and `repo` scope on `HARVEST_TOKEN`. Check that the token hasn't expired and has the full `repo` scope, not just `public_repo`.
 
-The traffic API requires admin/push access *and* the right token scope. Common causes:
-- Classic PAT missing the `repo` scope — regenerate with full `repo` scope
-- For org repos: you must be an **org owner**, not just a member
-- Fine-grained PATs need **"Repository traffic: Read"** set explicitly per repo
+**`gitdata` or `site` branch doesn't exist**
+Re-run the `00 · Setup Branches` workflow. It is idempotent — it skips branches that already exist and only creates missing ones.
 
 **Statistics workflow doesn't trigger after harvest**
+The `workflow_run` event only fires if `01-harvester.yml` is on the default branch (`main`). Verify the file is committed to `main`, not a feature branch. You can always trigger `02 · Statistics` manually.
 
-The `workflow_run` event only fires if the trigger workflow is on the default branch. Verify `01-harvester.yml` is committed to `main`. You can always trigger `02-statistics` manually from the Actions tab.
-
-**GitHub Pages shows 404 or the placeholder**
-
+**GitHub Pages shows the placeholder or 404**
 - Pages can take up to 10 minutes on first deploy
-- Verify: `My-Git-Statistics` → Settings → Pages → Source is `main` branch, `/docs` folder
-- Check the Pages deployment tab in `My-Git-Statistics` for build errors
+- Verify: **Settings → Pages → Source** is set to the `site` branch, root folder (`/`)
+- Check the Pages deployment tab for build errors
+- The `02 · Statistics` workflow must have run at least once successfully
 
 **Harvest lock is stuck**
+The `harvest.lock` file auto-expires after 2 hours. If a run was interrupted, the next run detects the stale lock and overwrites it. You can also delete `harvest.lock` from the `gitdata` branch in the GitHub UI.
 
-The `harvest.lock` file auto-expires after 2 hours. If a run was interrupted, the next run detects the stale lock and overwrites it. You can also delete `harvest.lock` directly in `GitData` if needed.
-
----
+**Push to gitdata/site fails with 403**
+`ACTIONS_TOKEN` needs `repo` + `workflow` scopes. Regenerate it if it has expired. Verify the token is stored under the exact name `ACTIONS_TOKEN` in Settings → Secrets.
 
 ## Contributing
 
 ```bash
 # Clone and set up
-git clone https://github.com/YOUR_USERNAME/GitEternal_v2.git
-cd GitEternal_v2
+git clone https://github.com/YOUR_USERNAME/GitEternal.git
+cd GitEternal
 pip install -r packages/engine/requirements.txt
 
 # Run tests
@@ -492,6 +486,6 @@ Just Python, Git, and GitHub Actions.
 
 <br /><br />
 
-**⭐ Star this repo if GitEternal_v2 is useful to you.**
+**⭐ Star this repo if GitEternal is useful to you.**
 
 </div>
