@@ -433,7 +433,7 @@ def _render_html(
 
 <header class="header">
   <span class="header-logo">📊</span>
-  <h1>{owner} · GitEternal_v2 Statistics</h1>
+  <h1>{owner} · GitEternal Statistics</h1>
   <div class="header-meta">
     Updated: <span id="generated-at"></span>
   </div>
@@ -487,7 +487,7 @@ def _render_html(
 </main>
 
 <footer class="footer">
-  Powered by <a href="https://github.com/{owner}/GitEternal_v2" target="_blank">GitEternal_v2</a>
+  Powered by <a href="https://github.com/{owner}/GitEternal" target="_blank">GitEternal_v2</a>
   — data stored privately, dashboard auto-generated weekly.
 </footer>
 
