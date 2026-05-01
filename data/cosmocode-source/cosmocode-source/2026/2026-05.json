@@ -1,0 +1,150 @@
+{
+  "checksum": "sha256:1efcb5eb0fc5657c90ebcd7c48a614581ba62a5f28f97b2552301be1ccdb406b",
+  "clones": [
+    {
+      "count": 0,
+      "date": "2026-04-17",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-18",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-19",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-20",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-21",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-22",
+      "uniques": 0
+    },
+    {
+      "count": 48,
+      "date": "2026-04-23",
+      "uniques": 32
+    },
+    {
+      "count": 7,
+      "date": "2026-04-24",
+      "uniques": 4
+    },
+    {
+      "count": 2,
+      "date": "2026-04-25",
+      "uniques": 2
+    },
+    {
+      "count": 0,
+      "date": "2026-04-26",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-27",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-04-28",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-04-29",
+      "uniques": 0
+    },
+    {
+      "count": 2,
+      "date": "2026-04-30",
+      "uniques": 2
+    }
+  ],
+  "month": "2026-05",
+  "referrers": [],
+  "repo": "cosmocode-source/cosmocode-source",
+  "views": [
+    {
+      "count": 0,
+      "date": "2026-04-17",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-18",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-19",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-20",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-21",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-22",
+      "uniques": 0
+    },
+    {
+      "count": 7,
+      "date": "2026-04-23",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-04-24",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-25",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-26",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-27",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-28",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-29",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-30",
+      "uniques": 0
+    }
+  ]
+}

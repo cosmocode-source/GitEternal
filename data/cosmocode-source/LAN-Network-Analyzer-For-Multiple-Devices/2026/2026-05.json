@@ -1,0 +1,150 @@
+{
+  "checksum": "sha256:bb40f4d6822a73c35f4666f8972140bfef5c7356a8d42b5ee67c98417aa25231",
+  "clones": [
+    {
+      "count": 1,
+      "date": "2026-04-17",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-04-18",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-19",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-20",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-21",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-04-22",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-04-23",
+      "uniques": 0
+    },
+    {
+      "count": 2,
+      "date": "2026-04-24",
+      "uniques": 2
+    },
+    {
+      "count": 6,
+      "date": "2026-04-25",
+      "uniques": 6
+    },
+    {
+      "count": 0,
+      "date": "2026-04-26",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-27",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-04-28",
+      "uniques": 1
+    },
+    {
+      "count": 1,
+      "date": "2026-04-29",
+      "uniques": 1
+    },
+    {
+      "count": 1,
+      "date": "2026-04-30",
+      "uniques": 1
+    }
+  ],
+  "month": "2026-05",
+  "referrers": [],
+  "repo": "cosmocode-source/LAN-Network-Analyzer-For-Multiple-Devices",
+  "views": [
+    {
+      "count": 0,
+      "date": "2026-04-17",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-18",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-19",
+      "uniques": 0
+    },
+    {
+      "count": 3,
+      "date": "2026-04-20",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-04-21",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-22",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-23",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-24",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-25",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-26",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-27",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-28",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-29",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-04-30",
+      "uniques": 0
+    }
+  ]
+}
