@@ -247,6 +247,8 @@ async def main() -> None:
         skipped_403: list[str] = []
         repo_errors: list[str] = []
 
+        owner_login = ""
+
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
 
@@ -257,6 +259,10 @@ async def main() -> None:
                     raise RuntimeError(f"Rate limit too low: {rate['remaining']} remaining")
 
                 owner_login = await _log_token_identity(harvest_token, client)
+                if not owner_login:
+                    raise RuntimeError(
+                        "HARVEST_TOKEN identity could not be resolved; check token validity/scopes."
+                    )
                 pinned: list[str] = [
                     r for r in config.get("tracked_repos", [])
                     if r.split("/")[0] == owner_login
