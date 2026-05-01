@@ -4,210 +4,1176 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>cosmocode-source · GitHub Statistics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg:      #0d1117; --surface: #161b22; --surface2: #21262d;
-      --border:  #30363d; --text:    #c9d1d9; --muted:    #8b949e;
-      --blue:    #58a6ff; --green:   #3fb950; --red:      #f85149;
-      --purple:  #bc8cff; --orange:  #d29922; --yellow:   #e3b341;
-      --radius:  8px;     --shadow:  0 1px 3px rgba(0,0,0,.4);
+      --bg:        #080c10;
+      --surface:   #0e1318;
+      --surface2:  #141b22;
+      --surface3:  #1a2430;
+      --border:    rgba(99,179,237,0.12);
+      --border2:   rgba(99,179,237,0.22);
+      --text:      #c8d8e8;
+      --muted:     #5d7a94;
+      --accent:    #4fc3f7;
+      --accent2:   #26a69a;
+      --accent3:   #81c784;
+      --gold:      #ffd54f;
+      --coral:     #ef9a9a;
+      --radius:    12px;
+      --radius-lg: 20px;
+      --font-display: 'Syne', sans-serif;
+      --font-mono:    'DM Mono', monospace;
+      --font-body:    'Inter', sans-serif;
     }
-    body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:14px; line-height:1.5; min-height:100vh; }
 
-    /* ── Header ── */
-    .header { background:var(--surface); border-bottom:1px solid var(--border); padding:1rem 1.5rem; display:flex; align-items:center; gap:1rem; }
-    .header-avatar { width:48px; height:48px; border-radius:50%; border:2px solid var(--border); object-fit:cover; }
-    .header-avatar-placeholder { width:48px; height:48px; border-radius:50%; background:var(--surface2); border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:1.4rem; }
-    .header-info h1 { font-size:1.1rem; font-weight:600; color:#f0f6fc; }
-    .header-info .sub { color:var(--muted); font-size:0.8rem; }
-    .header-meta { margin-left:auto; color:var(--muted); font-size:0.75rem; text-align:right; }
+    html { scroll-behavior: smooth; }
 
-    .main { max-width:1200px; margin:0 auto; padding:1.5rem; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-    /* ── Profile card ── */
-    .profile-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem 1.5rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; }
-    .profile-avatar { width:72px; height:72px; border-radius:50%; border:3px solid var(--border); object-fit:cover; flex-shrink:0; }
-    .profile-avatar-ph { width:72px; height:72px; border-radius:50%; background:var(--surface2); border:3px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:2rem; flex-shrink:0; }
-    .profile-details h2 { font-size:1.2rem; font-weight:700; color:#f0f6fc; }
-    .profile-details .bio { color:var(--muted); font-size:0.85rem; margin-top:.25rem; max-width:500px; }
-    .profile-meta { display:flex; gap:1rem; flex-wrap:wrap; margin-top:.5rem; font-size:0.78rem; color:var(--muted); }
-    .profile-meta span { display:flex; align-items:center; gap:.3rem; }
-    .profile-links { margin-left:auto; display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; }
-    .profile-links a { color:var(--blue); text-decoration:none; font-size:0.82rem; }
-    .profile-links a:hover { text-decoration:underline; }
+    /* ═══════════════════════════════════════════
+       SCROLL FADE SYSTEM
+    ═══════════════════════════════════════════ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s cubic-bezier(.16,1,.3,1), transform 0.7s cubic-bezier(.16,1,.3,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+    .reveal-delay-6 { transition-delay: 0.6s; }
 
-    /* ── Stat strip ── */
-    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.875rem; margin-bottom:1.5rem; }
-    .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.25rem; box-shadow:var(--shadow); position:relative; overflow:hidden; }
-    .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--accent-color,var(--blue)); }
-    .stat-label { color:var(--muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:.05em; margin-bottom:.3rem; }
-    .stat-value { font-size:1.6rem; font-weight:700; color:#f0f6fc; letter-spacing:-0.5px; }
-    .stat-sub { color:var(--muted); font-size:0.72rem; margin-top:.15rem; }
-    .stat-icon { position:absolute; right:1rem; top:50%; transform:translateY(-50%); font-size:1.6rem; opacity:.18; }
+    /* ═══════════════════════════════════════════
+       HERO SECTION
+    ═══════════════════════════════════════════ */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      padding: 2rem;
+    }
 
-    /* ── Cards ── */
-    .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); }
-    .card-header { padding:.875rem 1.25rem; border-bottom:1px solid var(--border); font-weight:600; color:#f0f6fc; font-size:.9rem; display:flex; align-items:center; gap:.5rem; }
-    .card-body { padding:1.25rem; }
-    .mb { margin-bottom:1rem; }
+    /* Animated gradient background */
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 40%, rgba(79,195,247,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 20% 80%, rgba(38,166,154,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 80% 20%, rgba(129,199,132,0.04) 0%, transparent 60%),
+        linear-gradient(180deg, #080c10 0%, #0a1018 40%, #080c10 100%);
+      animation: bgPulse 8s ease-in-out infinite alternate;
+    }
 
-    /* ── Chart ── */
-    .chart-wrap { position:relative; height:180px; }
-    canvas { width:100%!important; }
-    .chart-legend { display:flex; gap:1.5rem; font-size:.72rem; color:var(--muted); margin-top:.5rem; }
-    .chart-legend span { display:flex; align-items:center; gap:.3rem; }
-    .legend-dot { width:10px; height:10px; border-radius:2px; display:inline-block; }
+    @keyframes bgPulse {
+      0%   { opacity: 0.8; }
+      100% { opacity: 1; }
+    }
 
-    /* ── Language bar ── */
-    .lang-bar-wrap { margin-bottom:.75rem; }
-    .lang-bar { display:flex; height:8px; border-radius:4px; overflow:hidden; gap:2px; }
-    .lang-bar-seg { height:100%; border-radius:2px; transition:flex .3s; }
-    .lang-legend { display:flex; flex-wrap:wrap; gap:.5rem 1rem; margin-top:.6rem; font-size:.75rem; color:var(--muted); }
-    .lang-legend-item { display:flex; align-items:center; gap:.3rem; }
-    .lang-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    /* Grid overlay */
+    #hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(79,195,247,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,195,247,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 80%);
+      pointer-events: none;
+    }
 
-    /* ── Two-col ── */
-    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
-    @media(max-width:750px) { .grid-2 { grid-template-columns:1fr; } }
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      animation: heroFadeIn 1.2s cubic-bezier(.16,1,.3,1) forwards;
+      opacity: 0;
+    }
 
-    /* ── Table ── */
-    .table-wrap { overflow-x:auto; }
-    table { width:100%; border-collapse:collapse; font-size:.8rem; }
-    th { text-align:left; padding:.55rem .75rem; color:var(--muted); font-weight:500; border-bottom:1px solid var(--border); white-space:nowrap; }
-    td { padding:.6rem .75rem; border-bottom:1px solid var(--border); color:var(--text); }
-    tr:last-child td { border-bottom:none; }
-    tr:hover td { background:rgba(255,255,255,.025); }
-    .repo-link { color:var(--blue); text-decoration:none; font-weight:500; }
-    .repo-link:hover { text-decoration:underline; }
+    @keyframes heroFadeIn {
+      0%   { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
 
-    /* ── Badges ── */
-    .badge { display:inline-block; padding:.15rem .45rem; border-radius:20px; font-size:.72rem; font-weight:500; }
-    .badge-up   { background:rgba(63,185,80,.15);   color:var(--green); }
-    .badge-down { background:rgba(248,81,73,.15);   color:var(--red); }
-    .badge-flat { background:rgba(139,148,158,.12); color:var(--muted); }
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      opacity: 0.8;
+    }
 
-    /* ── Repo cards ── */
-    .repos-header { font-weight:600; color:#f0f6fc; font-size:.9rem; margin-bottom:.875rem; display:flex; align-items:center; gap:.5rem; }
-    .repo-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:.875rem; margin-bottom:1.5rem; }
-    .repo-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.1rem; display:flex; flex-direction:column; gap:.45rem; transition:border-color .15s,box-shadow .15s; }
-    .repo-card:hover { border-color:var(--blue); box-shadow:0 0 0 1px rgba(88,166,255,.2); }
-    .repo-card-title { font-weight:600; font-size:.875rem; }
-    .repo-card-title a { color:var(--blue); text-decoration:none; }
-    .repo-card-title a:hover { text-decoration:underline; }
-    .repo-card-desc { color:var(--muted); font-size:.775rem; line-height:1.45; flex:1; }
-    .repo-card-lang { display:flex; align-items:center; gap:.3rem; font-size:.75rem; color:var(--muted); }
-    .lang-circle { width:10px; height:10px; border-radius:50%; flex-shrink:0; background:var(--orange); }
-    .repo-card-stats { display:flex; flex-wrap:wrap; gap:.6rem; font-size:.75rem; color:var(--muted); }
-    .repo-card-stats span { display:flex; align-items:center; gap:.2rem; }
-    .repo-card-topics { display:flex; flex-wrap:wrap; gap:.3rem; }
-    .topic { background:rgba(88,166,255,.1); color:var(--blue); border-radius:20px; padding:.1rem .45rem; font-size:.68rem; }
+    .hero-avatar-wrap {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 1.75rem;
+    }
 
-    /* ── Footer ── */
-    .footer { text-align:center; color:var(--muted); font-size:.72rem; padding:2rem 0 1rem; }
-    .footer a { color:var(--blue); text-decoration:none; }
+    .hero-avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      border: 2px solid rgba(79,195,247,0.3);
+      object-fit: cover;
+      display: block;
+      box-shadow: 0 0 40px rgba(79,195,247,0.15), 0 0 80px rgba(79,195,247,0.05);
+    }
+
+    .hero-avatar-ph {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 2px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+      box-shadow: 0 0 40px rgba(79,195,247,0.1);
+    }
+
+    .hero-avatar-ring {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 1px solid rgba(79,195,247,0.2);
+      animation: ringPulse 3s ease-in-out infinite;
+    }
+
+    .hero-avatar-ring2 {
+      position: absolute;
+      inset: -16px;
+      border-radius: 50%;
+      border: 1px solid rgba(79,195,247,0.08);
+      animation: ringPulse 3s ease-in-out infinite 0.5s;
+    }
+
+    @keyframes ringPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%       { transform: scale(1.05); opacity: 0.5; }
+    }
+
+    .hero-name {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+      font-weight: 800;
+      color: #f0f8ff;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #e8f4fd 0%, #4fc3f7 50%, #26a69a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-bio {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--muted);
+      max-width: 460px;
+      margin: 0 auto 0.75rem;
+      line-height: 1.7;
+    }
+
+    .hero-location {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      margin-bottom: 2rem;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.5rem;
+      border: 1px solid var(--border2);
+      border-radius: 50px;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      background: rgba(79,195,247,0.05);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .hero-cta:hover {
+      background: rgba(79,195,247,0.12);
+      border-color: rgba(79,195,247,0.4);
+      box-shadow: 0 0 20px rgba(79,195,247,0.1);
+    }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0.4;
+      animation: scrollHint 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollHint {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.4; }
+      50%       { transform: translateX(-50%) translateY(6px); opacity: 0.2; }
+    }
+
+    .hero-scroll-hint span {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .scroll-arrow {
+      width: 1px;
+      height: 32px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+    }
+
+    /* ═══════════════════════════════════════════
+       INTRO SECTION
+    ═══════════════════════════════════════════ */
+    #intro {
+      padding: 6rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .section-label::before,
+    .section-label::after {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.4;
+    }
+
+    .intro-heading {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 700;
+      color: #e8f4fd;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .intro-heading em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .intro-body {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.8;
+      max-width: 640px;
+      margin: 0 auto 2rem;
+      font-weight: 300;
+    }
+
+    .intro-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .intro-tag {
+      padding: 0.35rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      background: var(--surface);
+    }
+
+    /* ═══════════════════════════════════════════
+       DIVIDER
+    ═══════════════════════════════════════════ */
+    .section-divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border2), transparent);
+      margin: 0;
+    }
+
+    /* ═══════════════════════════════════════════
+       STATS SECTION
+    ═══════════════════════════════════════════ */
+    #stats {
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .stats-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .stats-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 700;
+      color: #e8f4fd;
+      letter-spacing: -0.02em;
+    }
+
+    .stats-subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* Stat grid */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .stat-grid { grid-template-columns: 1fr; } }
+
+    .stat-card {
+      background: var(--surface);
+      padding: 2rem 1.75rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s ease;
+    }
+
+    .stat-card:hover {
+      background: var(--surface2);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent-color, var(--accent));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .stat-card:hover::before {
+      opacity: 1;
+    }
+
+    .stat-icon {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      display: block;
+      opacity: 0.7;
+    }
+
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #f0f8ff;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Secondary stats row */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .stat-pill:hover {
+      border-color: var(--border2);
+    }
+
+    .stat-pill-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .stat-pill-value {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #e8f4fd;
+    }
+
+    /* ═══════════════════════════════════════════
+       CHARTS SECTION
+    ═══════════════════════════════════════════ */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    @media (max-width: 800px) { .charts-grid { grid-template-columns: 1fr; } }
+
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .chart-card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chart-card-title {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #e8f4fd;
+    }
+
+    .chart-card-sub {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    .chart-card-body {
+      padding: 1.5rem;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 180px;
+    }
+
+    canvas { width: 100% !important; }
+
+    .chart-legend {
+      display: flex;
+      gap: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-top: 1rem;
+      letter-spacing: 0.05em;
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    /* Language bar */
+    .lang-bar {
+      display: flex;
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      gap: 2px;
+      margin-bottom: 1.25rem;
+    }
+
+    .lang-bar-seg {
+      height: 100%;
+      border-radius: 2px;
+      transition: flex 0.4s ease;
+    }
+
+    .lang-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .lang-legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .lang-legend-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .lang-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════
+       REPOS SECTION
+    ═══════════════════════════════════════════ */
+    #repos {
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .repos-header-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .repos-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 700;
+      color: #e8f4fd;
+      letter-spacing: -0.02em;
+    }
+
+    /* Masonry-inspired repo grid */
+    .repo-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+
+    .repo-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+    }
+
+    .repo-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(79,195,247,0.04) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .repo-card:hover {
+      border-color: rgba(79,195,247,0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(79,195,247,0.08);
+    }
+
+    .repo-card:hover::before {
+      opacity: 1;
+    }
+
+    /* Featured card — first one is slightly larger feel */
+    .repo-card.featured {
+      border-color: rgba(79,195,247,0.2);
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(79,195,247,0.03) 100%);
+    }
+
+    .repo-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .repo-card-name {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #e8f4fd;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .repo-card-name:hover {
+      color: var(--accent);
+    }
+
+    .repo-card-arrow {
+      color: var(--muted);
+      font-size: 0.8rem;
+      transition: color 0.2s ease, transform 0.2s ease;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .repo-card:hover .repo-card-arrow {
+      color: var(--accent);
+      transform: translate(2px, -2px);
+    }
+
+    .repo-card-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.55;
+      flex: 1;
+    }
+
+    .repo-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .repo-card-lang {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .lang-circle {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .repo-card-metrics {
+      display: flex;
+      gap: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+    }
+
+    .repo-card-topics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+
+    .topic {
+      background: rgba(79,195,247,0.08);
+      color: rgba(79,195,247,0.7);
+      border: 1px solid rgba(79,195,247,0.15);
+      border-radius: 50px;
+      padding: 0.15rem 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ═══════════════════════════════════════════
+       TRENDS TABLE SECTION
+    ═══════════════════════════════════════════ */
+    #analytics {
+      padding: 4rem 2rem 6rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 750px) { .analytics-grid { grid-template-columns: 1fr; } }
+
+    .analytics-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .analytics-card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .analytics-card-title {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #e8f4fd;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.65rem 1rem;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 400;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(79,195,247,0.02); }
+
+    .repo-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+    }
+
+    .repo-link:hover { text-decoration: underline; }
+
+    .badge {
+      display: inline-block;
+      padding: 0.12rem 0.5rem;
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+    }
+
+    .badge-up   { background: rgba(129,199,132,0.12); color: var(--accent3); border: 1px solid rgba(129,199,132,0.2); }
+    .badge-down { background: rgba(239,154,154,0.12); color: var(--coral);   border: 1px solid rgba(239,154,154,0.2); }
+    .badge-flat { background: rgba(93,122,148,0.12);  color: var(--muted);   border: 1px solid rgba(93,122,148,0.2); }
+
+    /* ═══════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════ */
+    #footer {
+      padding: 5rem 2rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #footer::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border2), transparent);
+    }
+
+    .footer-inner {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #e8f4fd;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-logo span {
+      color: var(--accent);
+    }
+
+    .footer-tagline {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+    }
+
+    .footer-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .stack-pill {
+      padding: 0.3rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      background: var(--surface);
+    }
+
+    .footer-meta {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      opacity: 0.6;
+    }
+
+    .footer-meta a {
+      color: var(--accent);
+      text-decoration: none;
+      opacity: 0.8;
+    }
+
+    .footer-meta a:hover { opacity: 1; }
+
+    /* ═══════════════════════════════════════════
+       UTILITIES
+    ═══════════════════════════════════════════ */
+    .section-sep {
+      width: 100%;
+      padding: 0 2rem;
+    }
+
+    .section-sep-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    @media (max-width: 600px) {
+      .stats-header, .repos-header-row { flex-direction: column; align-items: flex-start; }
+      .hero-name { font-size: 2.8rem; }
+    }
   </style>
 </head>
 <body>
 
-<header class="header">
-  <div class="header-avatar-placeholder">👤</div>
-  <div class="header-info">
-    <h1>cosmocode-source · GitHub Statistics</h1>
-    <div class="sub"></div>
-  </div>
-  <div class="header-meta">
-    Updated: <span id="generated-at"></span>
-  </div>
-</header>
+<!-- ════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">GitHub Portfolio</div>
 
-<main class="main">
-
-  <!-- Profile card -->
-  <div class="profile-card">
-    <div class="profile-avatar-ph">👤</div>
-    <div class="profile-details">
-      <h2>cosmocode-source</h2>
-      
-      <div class="profile-meta">
-        
-        <span id="prof-followers"></span>
-        <span id="prof-following"></span>
-        <span id="prof-repos"></span>
-      </div>
+    <div class="hero-avatar-wrap">
+      <div class="hero-avatar-ph">◈</div><div class="hero-avatar-ring"></div><div class="hero-avatar-ring2"></div>
     </div>
+
+    <h1 class="hero-name">cosmocode-source</h1>
+
     
+    
+
+    <button class="hero-cta" onclick="document.getElementById('intro').scrollIntoView({behavior:'smooth'})">
+      Explore Stats ↓
+    </button>
   </div>
 
-  <!-- Stat strip -->
+  <div class="hero-scroll-hint">
+    <div class="scroll-arrow"></div>
+    <span>scroll</span>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     INTRO
+════════════════════════════════════════════ -->
+<section id="intro">
+  <div class="section-label reveal">About this Dashboard</div>
+
+  <h2 class="intro-heading reveal reveal-delay-1">
+    A living archive of<br><em>every commit, clone &amp; star</em>
+  </h2>
+
+  <p class="intro-body reveal reveal-delay-2">
+    GitEternal tracks GitHub traffic data beyond the standard 14-day window,
+    preserving long-term repository metrics — clones, views, stars, forks —
+    into a permanent, queryable vault. This dashboard surfaces those insights
+    in real time.
+  </p>
+
+  <div class="intro-tags reveal reveal-delay-3">
+    <span class="intro-tag">Traffic Harvesting</span>
+    <span class="intro-tag">Long-term Archival</span>
+    <span class="intro-tag">GitHub Actions</span>
+    <span class="intro-tag">Python</span>
+    <span class="intro-tag">Auto-generated</span>
+    <span class="intro-tag">Self-contained</span>
+  </div>
+</section>
+
+<div class="section-sep"><div class="section-sep-line"></div></div>
+
+<!-- ════════════════════════════════════════════
+     STATS
+════════════════════════════════════════════ -->
+<section id="stats">
+  <div class="stats-header">
+    <div>
+      <div class="section-label reveal" style="justify-content:flex-start;">
+        <span style="width:40px;height:1px;background:var(--accent);opacity:0.4;display:block;"></span>
+        Metrics
+      </div>
+      <h2 class="stats-title reveal reveal-delay-1">Portfolio at a glance</h2>
+    </div>
+    <div class="stats-subtitle reveal reveal-delay-2" id="stats-generated"></div>
+  </div>
+
+  <!-- Primary stat grid -->
   <div class="stat-grid" id="stat-strip"></div>
 
-  <!-- Activity chart + Language breakdown -->
-  <div class="grid-2 mb">
-    <div class="card">
-      <div class="card-header">📈 Activity — last 365 days</div>
-      <div class="card-body">
+  <!-- Secondary pills -->
+  <div class="stat-row" id="stat-pills" style="margin-top:1rem;"></div>
+
+  <!-- Charts -->
+  <div class="charts-grid" style="margin-top:2rem;">
+    <div class="chart-card reveal">
+      <div class="chart-card-header">
+        <div class="chart-card-title">Activity — last 365 days</div>
+        <div class="chart-card-sub">Clones &amp; Views</div>
+      </div>
+      <div class="chart-card-body">
         <div class="chart-wrap"><canvas id="activityChart"></canvas></div>
         <div class="chart-legend">
-          <span><span class="legend-dot" style="background:var(--blue)"></span>Clones</span>
-          <span><span class="legend-dot" style="background:var(--green)"></span>Views</span>
+          <span><span class="legend-dot" style="background:var(--accent)"></span>Clones</span>
+          <span><span class="legend-dot" style="background:var(--accent2)"></span>Views</span>
         </div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-header">🌐 Language Breakdown</div>
-      <div class="card-body">
-        <div class="lang-bar-wrap">
-          <div class="lang-bar" id="lang-bar"></div>
-          <div class="lang-legend" id="lang-legend"></div>
-        </div>
+
+    <div class="chart-card reveal reveal-delay-2">
+      <div class="chart-card-header">
+        <div class="chart-card-title">Language Breakdown</div>
+        <div class="chart-card-sub">By repo count</div>
+      </div>
+      <div class="chart-card-body">
+        <div class="lang-bar" id="lang-bar"></div>
+        <div class="lang-legend" id="lang-legend"></div>
       </div>
     </div>
   </div>
+</section>
 
-  <!-- Repo cards -->
-  <div class="repos-header">📦 Repositories</div>
+<div class="section-sep"><div class="section-sep-line"></div></div>
+
+<!-- ════════════════════════════════════════════
+     REPOS
+════════════════════════════════════════════ -->
+<section id="repos">
+  <div class="repos-header-row">
+    <div>
+      <div class="section-label reveal" style="justify-content:flex-start;">
+        <span style="width:40px;height:1px;background:var(--accent);opacity:0.4;display:block;"></span>
+        Repositories
+      </div>
+      <h2 class="repos-title reveal reveal-delay-1">All tracked repos</h2>
+    </div>
+    <div class="stats-subtitle reveal reveal-delay-2" id="repos-count"></div>
+  </div>
+
   <div class="repo-cards" id="repo-cards"></div>
+</section>
 
-  <!-- Trends + Top by clones -->
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header">🔥 Week-over-Week Trends</div>
-      <div class="card-body" style="padding:0">
-        <div class="table-wrap">
-          <table id="trends-table">
-            <thead><tr><th>Repository</th><th>This Week</th><th>Last Week</th><th>Δ</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
+<div class="section-sep"><div class="section-sep-line"></div></div>
+
+<!-- ════════════════════════════════════════════
+     ANALYTICS TABLES
+════════════════════════════════════════════ -->
+<section id="analytics">
+  <div class="section-label reveal" style="justify-content:flex-start;margin-bottom:1.5rem;">
+    <span style="width:40px;height:1px;background:var(--accent);opacity:0.4;display:block;"></span>
+    Analytics
+  </div>
+
+  <div class="analytics-grid">
+    <div class="analytics-card reveal">
+      <div class="analytics-card-header">
+        <div class="analytics-card-title">Week-over-Week Trends</div>
+      </div>
+      <div class="table-wrap">
+        <table id="trends-table">
+          <thead>
+            <tr>
+              <th>Repository</th>
+              <th>This Week</th>
+              <th>Last Week</th>
+              <th>Δ</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
-    <div class="card">
-      <div class="card-header">⭐ Top by Stars</div>
-      <div class="card-body" style="padding:0">
-        <div class="table-wrap">
-          <table id="stars-table">
-            <thead><tr><th>#</th><th>Repository</th><th>Stars</th><th>Forks</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
+
+    <div class="analytics-card reveal reveal-delay-2">
+      <div class="analytics-card-header">
+        <div class="analytics-card-title">Top by Stars</div>
+      </div>
+      <div class="table-wrap">
+        <table id="stars-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Repository</th>
+              <th>Stars</th>
+              <th>Forks</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>
+</section>
 
-</main>
+<!-- ════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════ -->
+<footer id="footer">
+  <div class="footer-inner reveal">
+    <div class="footer-logo">Git<span>Eternal</span></div>
+    <div class="footer-tagline">Preserving GitHub history, forever</div>
 
-<footer class="footer">
-  Powered by <a href="https://github.com/cosmocode-source/GitEternal" target="_blank">GitEternal</a>
-  · Data stored privately · Dashboard auto-generated weekly
+    <div class="footer-stack">
+      <span class="stack-pill">Python 3.12</span>
+      <span class="stack-pill">GitHub Actions</span>
+      <span class="stack-pill">Pydantic</span>
+      <span class="stack-pill">httpx</span>
+      <span class="stack-pill">GitHub Pages</span>
+    </div>
+
+    <div class="footer-meta">
+      Powered by <a href="https://github.com/cosmocode-source/GitEternal" target="_blank">GitEternal</a>
+      &nbsp;·&nbsp; Data stored privately
+      &nbsp;·&nbsp; Dashboard auto-generated weekly
+    </div>
+  </div>
 </footer>
 
+<!-- ════════════════════════════════════════════
+     DATA + SCRIPTS
+════════════════════════════════════════════ -->
 <script>
-const SUMMARY     = {"generated_at":"2026-05-01T18:58:27.858102+00:00","total_repos":13,"lifetime_clones":368,"lifetime_uniques":193,"total_stars":0,"total_forks":0,"most_active_repo":"cosmocode-source/PES1UG24CS079-pes-vcs","most_starred_repo":"cosmocode-source/EscapeRoom-Game","top_language":"Python","language_breakdown":{"C":3,"JavaScript":2,"Python":4,"HTML":1,"Shell":1}};
-const TOP_REPOS   = [{"repo":"cosmocode-source/PES1UG24CS079-pes-vcs","description":"Building your own version control system for file management","lifetime_clones":208,"lifetime_uniques":69,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:38:00.203350+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"C","topics":[]},{"repo":"cosmocode-source/cosmocode-source","description":"","lifetime_clones":60,"lifetime_uniques":41,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:38:01.468913+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"","topics":[]},{"repo":"cosmocode-source/Hand-Gesture-Based-Media-Mouse-Control","description":"Gesture-controlled system that uses a webcam and MediaPipe hand tracking to control media playback and mouse actions in real time.                                                            Includes a web UI, FastAPI backend, mode switching (MEDIA/MOUSE), finger-based gestures, and OS-level control via PyAutoGUI.","lifetime_clones":24,"lifetime_uniques":21,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:57.826639+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":1,"language":"","topics":[]},{"repo":"cosmocode-source/GitEternal","description":"This repo is for generating GitHub statistics that get erased every 14-day. ","lifetime_clones":13,"lifetime_uniques":2,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:57.430197+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"Python","topics":[]},{"repo":"cosmocode-source/LAN-Network-Analyzer-For-Multiple-Devices","description":"In this repo we just connect to same LAN and download files from a server desktop to Multiple client desktops.  This gives us a detailed report on the throughput, latency, download time and traffic trend on the network. This project majorly focuses on LAN networks. ","lifetime_clones":13,"lifetime_uniques":13,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:58.572177+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"Python","topics":[]},{"repo":"cosmocode-source/Network_Download_Analyzer","description":"This project measures internet download performance over time. A Python program automatically downloads a 100MB test file from different servers and records information like download speed, latency, and connection time. The data is stored in a database and shown in a dashboard where we can see how the network performance changes during the day.","lifetime_clones":11,"lifetime_uniques":11,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:59.324121+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"Python","topics":[]},{"repo":"cosmocode-source/KochiConnect","description":"Contains a sample site with the info and reference links we used for the Smart India Hackathon","lifetime_clones":8,"lifetime_uniques":5,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:58.212408+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"HTML","topics":[]},{"repo":"cosmocode-source/OS-Jackfruit","description":"This repo is for the Operating Systems assignment given by PES University.  The task here was to create the engine.c and monitor.c which works as user level manager and Linux Kernal Module. Both the files are used to make local containers on the ubuntu machine with specific requirements. Both requirements and the solutions are mentioned in ReadME. ","lifetime_clones":7,"lifetime_uniques":7,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:59.808393+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"C","topics":[]},{"repo":"cosmocode-source/QoS-Priority-Controller","description":"This a Problem solving and learning exercise is designed by PES University to increase the understanding of how SDN works in the network layer. We use Mininet and Ryu as simulator and controller of a virtual network and test things on these tools. This project shows a priority controller for when multiple packets are being transferred over network.","lifetime_clones":7,"lifetime_uniques":7,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:38:00.641812+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"Python","topics":[]},{"repo":"cosmocode-source/Taskman-Site","description":"This a second-year web development project which is made by MERN stack. It has helped in many ways and also made us gain experience and proficient in MERN stack.","lifetime_clones":7,"lifetime_uniques":7,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:38:01.044249+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"JavaScript","topics":[]},{"repo":"cosmocode-source/Multi-Cloud-Security-Management","description":"A Flask-based web application that automatically detects, audits, and remediates misconfigurations across multiple cloud environments.","lifetime_clones":4,"lifetime_uniques":4,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:58.945671+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"Shell","topics":[]},{"repo":"cosmocode-source/EscapeRoom-Game","description":"A text based adventure game for a first year C mini  project. ","lifetime_clones":3,"lifetime_uniques":3,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:56.692841+00:00","available_months":1,"stars":0,"forks":0,"watchers":1,"open_issues":0,"language":"C","topics":[]},{"repo":"cosmocode-source/EscapeRoomGameOnline","description":"This the website version of the before made C text based adventurous game that I made for my first year project.","lifetime_clones":3,"lifetime_uniques":3,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:57.063209+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"JavaScript","topics":[]}];
-const TRENDS      = [{"repo":"cosmocode-source/PES1UG24CS079-pes-vcs","current_week_clones":25,"prior_week_clones":74,"clone_delta_pct":-66.2,"current_week_views":0,"prior_week_views":48,"view_delta_pct":-100.0},{"repo":"cosmocode-source/GitEternal","current_week_clones":13,"prior_week_clones":0,"clone_delta_pct":null,"current_week_views":146,"prior_week_views":18,"view_delta_pct":711.1},{"repo":"cosmocode-source/LAN-Network-Analyzer-For-Multiple-Devices","current_week_clones":9,"prior_week_clones":3,"clone_delta_pct":200.0,"current_week_views":0,"prior_week_views":3,"view_delta_pct":-100.0},{"repo":"cosmocode-source/Hand-Gesture-Based-Media-Mouse-Control","current_week_clones":5,"prior_week_clones":18,"clone_delta_pct":-72.2,"current_week_views":0,"prior_week_views":4,"view_delta_pct":-100.0},{"repo":"cosmocode-source/OS-Jackfruit","current_week_clones":5,"prior_week_clones":2,"clone_delta_pct":150.0,"current_week_views":0,"prior_week_views":92,"view_delta_pct":-100.0},{"repo":"cosmocode-source/cosmocode-source","current_week_clones":5,"prior_week_clones":55,"clone_delta_pct":-90.9,"current_week_views":0,"prior_week_views":7,"view_delta_pct":-100.0},{"repo":"cosmocode-source/Network_Download_Analyzer","current_week_clones":3,"prior_week_clones":7,"clone_delta_pct":-57.1,"current_week_views":0,"prior_week_views":3,"view_delta_pct":-100.0},{"repo":"cosmocode-source/QoS-Priority-Controller","current_week_clones":3,"prior_week_clones":3,"clone_delta_pct":0.0,"current_week_views":0,"prior_week_views":3,"view_delta_pct":-100.0},{"repo":"cosmocode-source/EscapeRoom-Game","current_week_clones":0,"prior_week_clones":2,"clone_delta_pct":-100.0,"current_week_views":0,"prior_week_views":0,"view_delta_pct":null},{"repo":"cosmocode-source/EscapeRoomGameOnline","current_week_clones":0,"prior_week_clones":2,"clone_delta_pct":-100.0,"current_week_views":1,"prior_week_views":0,"view_delta_pct":null},{"repo":"cosmocode-source/KochiConnect","current_week_clones":0,"prior_week_clones":7,"clone_delta_pct":-100.0,"current_week_views":0,"prior_week_views":0,"view_delta_pct":null},{"repo":"cosmocode-source/Multi-Cloud-Security-Management","current_week_clones":0,"prior_week_clones":3,"clone_delta_pct":-100.0,"current_week_views":0,"prior_week_views":1,"view_delta_pct":-100.0},{"repo":"cosmocode-source/Taskman-Site","current_week_clones":0,"prior_week_clones":6,"clone_delta_pct":-100.0,"current_week_views":0,"prior_week_views":1,"view_delta_pct":-100.0}];
-const CHART_DATA  = [{"date":"2026-04-17","clones":118,"views":93},{"date":"2026-04-18","clones":2,"views":6},{"date":"2026-04-19","clones":5,"views":22},{"date":"2026-04-20","clones":8,"views":59},{"date":"2026-04-21","clones":6,"views":56},{"date":"2026-04-22","clones":44,"views":0},{"date":"2026-04-23","clones":55,"views":31},{"date":"2026-04-24","clones":62,"views":6},{"date":"2026-04-25","clones":40,"views":0},{"date":"2026-04-26","clones":3,"views":0},{"date":"2026-04-27","clones":2,"views":0},{"date":"2026-04-28","clones":3,"views":0},{"date":"2026-04-29","clones":2,"views":0},{"date":"2026-04-30","clones":18,"views":147}];
-const OWNER_STATS = {"avatar_url":"","bio":"","blog":"","followers":0,"following":0,"harvested_at":"2026-05-01T18:38:01.470165+00:00","location":"","public_repos":0,"total_commits":0,"total_issues":0,"total_prs":0};
+const SUMMARY      = {"generated_at":"2026-05-01T19:25:49.616144+00:00","total_repos":13,"lifetime_clones":368,"lifetime_uniques":193,"total_stars":0,"total_forks":0,"most_active_repo":"cosmocode-source/PES1UG24CS079-pes-vcs","most_starred_repo":"cosmocode-source/EscapeRoom-Game","top_language":"Python","language_breakdown":{"C":3,"JavaScript":2,"Python":4,"HTML":1,"Shell":1}};
+const TOP_REPOS    = [{"repo":"cosmocode-source/PES1UG24CS079-pes-vcs","description":"Building your own version control system for file management","lifetime_clones":208,"lifetime_uniques":69,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:38:00.203350+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"C","topics":[]},{"repo":"cosmocode-source/cosmocode-source","description":"","lifetime_clones":60,"lifetime_uniques":41,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:38:01.468913+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"","topics":[]},{"repo":"cosmocode-source/Hand-Gesture-Based-Media-Mouse-Control","description":"Gesture-controlled system that uses a webcam and MediaPipe hand tracking to control media playback and mouse actions in real time.                                                            Includes a web UI, FastAPI backend, mode switching (MEDIA/MOUSE), finger-based gestures, and OS-level control via PyAutoGUI.","lifetime_clones":24,"lifetime_uniques":21,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:57.826639+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":1,"language":"","topics":[]},{"repo":"cosmocode-source/GitEternal","description":"This repo is for generating GitHub statistics that get erased every 14-day. ","lifetime_clones":13,"lifetime_uniques":2,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:57.430197+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"Python","topics":[]},{"repo":"cosmocode-source/LAN-Network-Analyzer-For-Multiple-Devices","description":"In this repo we just connect to same LAN and download files from a server desktop to Multiple client desktops.  This gives us a detailed report on the throughput, latency, download time and traffic trend on the network. This project majorly focuses on LAN networks. ","lifetime_clones":13,"lifetime_uniques":13,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:58.572177+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"Python","topics":[]},{"repo":"cosmocode-source/Network_Download_Analyzer","description":"This project measures internet download performance over time. A Python program automatically downloads a 100MB test file from different servers and records information like download speed, latency, and connection time. The data is stored in a database and shown in a dashboard where we can see how the network performance changes during the day.","lifetime_clones":11,"lifetime_uniques":11,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:59.324121+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"Python","topics":[]},{"repo":"cosmocode-source/KochiConnect","description":"Contains a sample site with the info and reference links we used for the Smart India Hackathon","lifetime_clones":8,"lifetime_uniques":5,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:58.212408+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"HTML","topics":[]},{"repo":"cosmocode-source/OS-Jackfruit","description":"This repo is for the Operating Systems assignment given by PES University.  The task here was to create the engine.c and monitor.c which works as user level manager and Linux Kernal Module. Both the files are used to make local containers on the ubuntu machine with specific requirements. Both requirements and the solutions are mentioned in ReadME. ","lifetime_clones":7,"lifetime_uniques":7,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:59.808393+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"C","topics":[]},{"repo":"cosmocode-source/QoS-Priority-Controller","description":"This a Problem solving and learning exercise is designed by PES University to increase the understanding of how SDN works in the network layer. We use Mininet and Ryu as simulator and controller of a virtual network and test things on these tools. This project shows a priority controller for when multiple packets are being transferred over network.","lifetime_clones":7,"lifetime_uniques":7,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:38:00.641812+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"Python","topics":[]},{"repo":"cosmocode-source/Taskman-Site","description":"This a second-year web development project which is made by MERN stack. It has helped in many ways and also made us gain experience and proficient in MERN stack.","lifetime_clones":7,"lifetime_uniques":7,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:38:01.044249+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"JavaScript","topics":[]},{"repo":"cosmocode-source/Multi-Cloud-Security-Management","description":"A Flask-based web application that automatically detects, audits, and remediates misconfigurations across multiple cloud environments.","lifetime_clones":4,"lifetime_uniques":4,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:58.945671+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"Shell","topics":[]},{"repo":"cosmocode-source/EscapeRoom-Game","description":"A text based adventure game for a first year C mini  project. ","lifetime_clones":3,"lifetime_uniques":3,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:56.692841+00:00","available_months":1,"stars":0,"forks":0,"watchers":1,"open_issues":0,"language":"C","topics":[]},{"repo":"cosmocode-source/EscapeRoomGameOnline","description":"This the website version of the before made C text based adventurous game that I made for my first year project.","lifetime_clones":3,"lifetime_uniques":3,"first_date":"2026-04-17","last_date":"2026-04-30","last_harvest":"2026-05-01T18:37:57.063209+00:00","available_months":1,"stars":0,"forks":0,"watchers":0,"open_issues":0,"language":"JavaScript","topics":[]}];
+const TRENDS       = [{"repo":"cosmocode-source/PES1UG24CS079-pes-vcs","current_week_clones":25,"prior_week_clones":74,"clone_delta_pct":-66.2,"current_week_views":0,"prior_week_views":48,"view_delta_pct":-100.0},{"repo":"cosmocode-source/GitEternal","current_week_clones":13,"prior_week_clones":0,"clone_delta_pct":null,"current_week_views":146,"prior_week_views":18,"view_delta_pct":711.1},{"repo":"cosmocode-source/LAN-Network-Analyzer-For-Multiple-Devices","current_week_clones":9,"prior_week_clones":3,"clone_delta_pct":200.0,"current_week_views":0,"prior_week_views":3,"view_delta_pct":-100.0},{"repo":"cosmocode-source/Hand-Gesture-Based-Media-Mouse-Control","current_week_clones":5,"prior_week_clones":18,"clone_delta_pct":-72.2,"current_week_views":0,"prior_week_views":4,"view_delta_pct":-100.0},{"repo":"cosmocode-source/OS-Jackfruit","current_week_clones":5,"prior_week_clones":2,"clone_delta_pct":150.0,"current_week_views":0,"prior_week_views":92,"view_delta_pct":-100.0},{"repo":"cosmocode-source/cosmocode-source","current_week_clones":5,"prior_week_clones":55,"clone_delta_pct":-90.9,"current_week_views":0,"prior_week_views":7,"view_delta_pct":-100.0},{"repo":"cosmocode-source/Network_Download_Analyzer","current_week_clones":3,"prior_week_clones":7,"clone_delta_pct":-57.1,"current_week_views":0,"prior_week_views":3,"view_delta_pct":-100.0},{"repo":"cosmocode-source/QoS-Priority-Controller","current_week_clones":3,"prior_week_clones":3,"clone_delta_pct":0.0,"current_week_views":0,"prior_week_views":3,"view_delta_pct":-100.0},{"repo":"cosmocode-source/EscapeRoom-Game","current_week_clones":0,"prior_week_clones":2,"clone_delta_pct":-100.0,"current_week_views":0,"prior_week_views":0,"view_delta_pct":null},{"repo":"cosmocode-source/EscapeRoomGameOnline","current_week_clones":0,"prior_week_clones":2,"clone_delta_pct":-100.0,"current_week_views":1,"prior_week_views":0,"view_delta_pct":null},{"repo":"cosmocode-source/KochiConnect","current_week_clones":0,"prior_week_clones":7,"clone_delta_pct":-100.0,"current_week_views":0,"prior_week_views":0,"view_delta_pct":null},{"repo":"cosmocode-source/Multi-Cloud-Security-Management","current_week_clones":0,"prior_week_clones":3,"clone_delta_pct":-100.0,"current_week_views":0,"prior_week_views":1,"view_delta_pct":-100.0},{"repo":"cosmocode-source/Taskman-Site","current_week_clones":0,"prior_week_clones":6,"clone_delta_pct":-100.0,"current_week_views":0,"prior_week_views":1,"view_delta_pct":-100.0}];
+const CHART_DATA   = [{"date":"2026-04-17","clones":118,"views":93},{"date":"2026-04-18","clones":2,"views":6},{"date":"2026-04-19","clones":5,"views":22},{"date":"2026-04-20","clones":8,"views":59},{"date":"2026-04-21","clones":6,"views":56},{"date":"2026-04-22","clones":44,"views":0},{"date":"2026-04-23","clones":55,"views":31},{"date":"2026-04-24","clones":62,"views":6},{"date":"2026-04-25","clones":40,"views":0},{"date":"2026-04-26","clones":3,"views":0},{"date":"2026-04-27","clones":2,"views":0},{"date":"2026-04-28","clones":3,"views":0},{"date":"2026-04-29","clones":2,"views":0},{"date":"2026-04-30","clones":18,"views":147}];
+const OWNER_STATS  = {"avatar_url":"","bio":"","blog":"","followers":0,"following":0,"harvested_at":"2026-05-01T18:38:01.470165+00:00","location":"","public_repos":0,"total_commits":0,"total_issues":0,"total_prs":0};
 
 const LANG_COLORS = {
   'Python':'#3572A5','JavaScript':'#f1e05a','TypeScript':'#2b7489','Java':'#b07219',
@@ -220,123 +1186,160 @@ const LANG_COLORS = {
 function fmt(n) { return n == null ? '—' : Number(n).toLocaleString(); }
 function fmtPct(v) {
   if (v == null) return '<span class="badge badge-flat">—</span>';
-  const s = v >= 0 ? '+' : ''; const c = v > 0 ? 'badge-up' : v < 0 ? 'badge-down' : 'badge-flat';
+  const s = v >= 0 ? '+' : '';
+  const c = v > 0 ? 'badge-up' : v < 0 ? 'badge-down' : 'badge-flat';
   return `<span class="badge ${c}">${s}${v}%</span>`;
 }
 
-// ── Stat strip ──────────────────────────────────────────────────────────────
+// ── Stat strip ────────────────────────────────────────────────────────────────
 function renderStats() {
-  const stats = [
-    { label:'Public Repos',    value:fmt(SUMMARY.total_repos),         sub:'tracked',     icon:'📦', color:'var(--blue)'   },
-    { label:'Total Stars',     value:fmt(SUMMARY.total_stars),         sub:'across repos', icon:'⭐', color:'var(--yellow)' },
-    { label:'Total Forks',     value:fmt(SUMMARY.total_forks),         sub:'across repos', icon:'🍴', color:'var(--green)'  },
-    { label:'Lifetime Clones', value:fmt(SUMMARY.lifetime_clones),     sub:'all time',    icon:'📥', color:'var(--purple)' },
-    { label:'Unique Cloners',  value:fmt(SUMMARY.lifetime_uniques),    sub:'all time',    icon:'👤', color:'var(--orange)' },
-    { label:'Total Commits',   value:fmt(OWNER_STATS.total_commits),   sub:'all time',    icon:'💻', color:'var(--green)'  },
-    { label:'Total PRs',       value:fmt(OWNER_STATS.total_prs),       sub:'all time',    icon:'🔀', color:'var(--blue)'   },
-    { label:'Followers',       value:fmt(OWNER_STATS.followers),       sub:'on GitHub',   icon:'👥', color:'var(--purple)' },
+  const primary = [
+    { label:'Repos',          value:fmt(SUMMARY.total_repos),       icon:'◫', color:'var(--accent)'  },
+    { label:'Stars',          value:fmt(SUMMARY.total_stars),       icon:'✦', color:'var(--gold)'    },
+    { label:'Forks',          value:fmt(SUMMARY.total_forks),       icon:'⑂', color:'var(--accent2)' },
+    { label:'Lifetime Clones',value:fmt(SUMMARY.lifetime_clones),   icon:'↓', color:'var(--accent3)' },
+    { label:'Unique Cloners', value:fmt(SUMMARY.lifetime_uniques),  icon:'◎', color:'var(--accent)'  },
+    { label:'Commits',        value:fmt(OWNER_STATS.total_commits), icon:'●', color:'var(--accent2)' },
+    { label:'Pull Requests',  value:fmt(OWNER_STATS.total_prs),     icon:'⇌', color:'var(--accent)'  },
+    { label:'Followers',      value:fmt(OWNER_STATS.followers),     icon:'◈', color:'var(--gold)'    },
   ];
-  document.getElementById('stat-strip').innerHTML = stats.map(s => `
-    <div class="stat-card" style="--accent-color:${s.color}">
-      <div class="stat-label">${s.label}</div>
+
+  const strip = document.getElementById('stat-strip');
+  strip.innerHTML = primary.map((s, i) => `
+    <div class="stat-card reveal reveal-delay-${Math.min(i+1,6)}" style="--accent-color:${s.color}">
+      <span class="stat-icon" style="color:${s.color}">${s.icon}</span>
       <div class="stat-value">${s.value}</div>
-      <div class="stat-sub">${s.sub}</div>
-      <div class="stat-icon">${s.icon}</div>
+      <div class="stat-label">${s.label}</div>
     </div>`).join('');
 
-  // Profile meta
-  if (OWNER_STATS.followers) document.getElementById('prof-followers').textContent = `👥 ${fmt(OWNER_STATS.followers)} followers`;
-  if (OWNER_STATS.following) document.getElementById('prof-following').textContent = `· ${fmt(OWNER_STATS.following)} following`;
-  if (OWNER_STATS.public_repos) document.getElementById('prof-repos').textContent = `· ${fmt(OWNER_STATS.public_repos)} public repos`;
+  const pills = [
+    { label:'Total Issues', value:fmt(OWNER_STATS.total_issues) },
+    { label:'Following',    value:fmt(OWNER_STATS.following) },
+    { label:'Public Repos', value:fmt(OWNER_STATS.public_repos) },
+    { label:'Top Language', value:SUMMARY.top_language || '—' },
+  ];
 
-  const genAt = document.getElementById('generated-at');
-  if (SUMMARY.generated_at) genAt.textContent = new Date(SUMMARY.generated_at).toLocaleString();
+  document.getElementById('stat-pills').innerHTML = pills.map(p => `
+    <div class="stat-pill reveal">
+      <div class="stat-pill-label">${p.label}</div>
+      <div class="stat-pill-value">${p.value}</div>
+    </div>`).join('');
+
+  if (SUMMARY.generated_at) {
+    document.getElementById('stats-generated').textContent =
+      'Updated ' + new Date(SUMMARY.generated_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'});
+  }
+
+  // Re-observe new elements
+  observeAll();
 }
 
-// ── Language bar ────────────────────────────────────────────────────────────
+// ── Language bar ──────────────────────────────────────────────────────────────
 function renderLangBar() {
   const langs = SUMMARY.language_breakdown || {};
-  const total = Object.values(langs).reduce((a,b) => a+b, 0);
+  const total = Object.values(langs).reduce((a,b)=>a+b,0);
   if (!total) return;
-  const sorted = Object.entries(langs).sort((a,b) => b[1]-a[1]);
+  const sorted = Object.entries(langs).sort((a,b)=>b[1]-a[1]);
   const bar = document.getElementById('lang-bar');
   const legend = document.getElementById('lang-legend');
   bar.innerHTML = sorted.map(([lang, count]) => {
-    const pct = (count / total * 100).toFixed(1);
-    const color = LANG_COLORS[lang] || 'var(--muted)';
+    const pct = (count/total*100).toFixed(1);
+    const color = LANG_COLORS[lang] || '#5d7a94';
     return `<div class="lang-bar-seg" style="flex:${pct};background:${color}" title="${lang} ${pct}%"></div>`;
   }).join('');
-  legend.innerHTML = sorted.slice(0, 10).map(([lang, count]) => {
-    const pct = (count / total * 100).toFixed(1);
-    const color = LANG_COLORS[lang] || 'var(--muted)';
-    return `<div class="lang-legend-item"><span class="lang-dot" style="background:${color}"></span>${lang} ${pct}%</div>`;
-  }).join('');
-}
-
-// ── Repo cards ───────────────────────────────────────────────────────────────
-function renderRepoCards() {
-  const container = document.getElementById('repo-cards');
-  if (!container || !TOP_REPOS.length) return;
-  container.innerHTML = TOP_REPOS.map(r => {
-    const [, repo] = r.repo.split('/');
-    const desc   = r.description ? `<div class="repo-card-desc">${r.description}</div>` : '';
-    const lang   = r.language ? `<div class="repo-card-lang"><span class="lang-circle" style="background:${LANG_COLORS[r.language]||'var(--muted)'}"></span>${r.language}</div>` : '';
-    const topics = r.topics?.length ? `<div class="repo-card-topics">${r.topics.slice(0,3).map(t=>`<span class="topic">${t}</span>`).join('')}</div>` : '';
-    return `<div class="repo-card">
-      <div class="repo-card-title"><a href="https://github.com/${r.repo}" target="_blank">${repo}</a></div>
-      ${desc}${lang}
-      <div class="repo-card-stats">
-        <span>⭐ ${fmt(r.stars)}</span>
-        <span>🍴 ${fmt(r.forks)}</span>
-        <span>👁 ${fmt(r.watchers)}</span>
-        <span>📥 ${fmt(r.lifetime_clones)}</span>
-        ${r.open_issues ? `<span>⚠ ${r.open_issues}</span>` : ''}
+  legend.innerHTML = sorted.slice(0,8).map(([lang, count]) => {
+    const pct = (count/total*100).toFixed(1);
+    const color = LANG_COLORS[lang] || '#5d7a94';
+    return `<div class="lang-legend-item">
+      <div class="lang-legend-left">
+        <span class="lang-dot" style="background:${color}"></span>
+        ${lang}
       </div>
-      ${topics}
+      <span>${pct}%</span>
     </div>`;
   }).join('');
 }
 
-// ── Trends table ─────────────────────────────────────────────────────────────
+// ── Repo cards ────────────────────────────────────────────────────────────────
+function renderRepoCards() {
+  const container = document.getElementById('repo-cards');
+  if (!container || !TOP_REPOS.length) return;
+
+  document.getElementById('repos-count').textContent = TOP_REPOS.length + ' repositories';
+
+  container.innerHTML = TOP_REPOS.map((r, idx) => {
+    const [, repo] = r.repo.split('/');
+    const isFeatured = idx === 0 ? 'featured' : '';
+    const desc   = r.description
+      ? `<div class="repo-card-desc">${r.description}</div>` : '';
+    const lang   = r.language
+      ? `<div class="repo-card-lang"><span class="lang-circle" style="background:${LANG_COLORS[r.language]||'#5d7a94'}"></span>${r.language}</div>` : '';
+    const topics = r.topics?.length
+      ? `<div class="repo-card-topics">${r.topics.slice(0,3).map(t=>`<span class="topic">${t}</span>`).join('')}</div>` : '';
+    const delay  = `reveal-delay-${Math.min((idx % 6)+1, 6)}`;
+    return `
+    <div class="repo-card ${isFeatured} reveal ${delay}">
+      <div class="repo-card-top">
+        <a class="repo-card-name" href="https://github.com/${r.repo}" target="_blank">${repo}</a>
+        <span class="repo-card-arrow">↗</span>
+      </div>
+      ${desc}
+      ${topics}
+      <div class="repo-card-footer">
+        ${lang}
+        <div class="repo-card-metrics">
+          <span>✦ ${fmt(r.stars)}</span>
+          <span>⑂ ${fmt(r.forks)}</span>
+          <span>↓ ${fmt(r.lifetime_clones)}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  observeAll();
+}
+
+// ── Trends table ──────────────────────────────────────────────────────────────
 function renderTrends() {
   document.querySelector('#trends-table tbody').innerHTML =
-    TRENDS.slice(0,15).map(r => {
+    TRENDS.slice(0,12).map(r => {
       const [,repo] = r.repo.split('/');
       return `<tr>
         <td><a class="repo-link" href="https://github.com/${r.repo}" target="_blank">${repo}</a></td>
-        <td>${fmt(r.current_week_clones)}</td>
-        <td>${fmt(r.prior_week_clones)}</td>
+        <td style="font-family:var(--font-mono);font-size:.72rem">${fmt(r.current_week_clones)}</td>
+        <td style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted)">${fmt(r.prior_week_clones)}</td>
         <td>${fmtPct(r.clone_delta_pct)}</td>
       </tr>`;
     }).join('');
 }
 
-// ── Top by stars table ───────────────────────────────────────────────────────
+// ── Stars table ───────────────────────────────────────────────────────────────
 function renderStarsTable() {
-  const sorted = [...TOP_REPOS].sort((a,b) => (b.stars||0)-(a.stars||0));
+  const sorted = [...TOP_REPOS].sort((a,b)=>(b.stars||0)-(a.stars||0));
   document.querySelector('#stars-table tbody').innerHTML =
-    sorted.slice(0,15).map((r,i) => {
+    sorted.slice(0,12).map((r,i) => {
       const [,repo] = r.repo.split('/');
       return `<tr>
-        <td style="color:var(--muted)">${i+1}</td>
+        <td style="color:var(--muted);font-family:var(--font-mono);font-size:.7rem">${i+1}</td>
         <td><a class="repo-link" href="https://github.com/${r.repo}" target="_blank">${repo}</a></td>
-        <td>⭐ ${fmt(r.stars)}</td>
-        <td>🍴 ${fmt(r.forks)}</td>
+        <td style="font-family:var(--font-mono);font-size:.72rem">✦ ${fmt(r.stars)}</td>
+        <td style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted)">⑂ ${fmt(r.forks)}</td>
       </tr>`;
     }).join('');
 }
 
-// ── Activity chart ───────────────────────────────────────────────────────────
+// ── Activity chart ────────────────────────────────────────────────────────────
 function renderChart() {
   const canvas = document.getElementById('activityChart');
   if (!canvas || !CHART_DATA.length) return;
   const dpr = window.devicePixelRatio || 1;
-  const W = canvas.parentElement.getBoundingClientRect().width;
+  const W = canvas.parentElement.getBoundingClientRect().width || 600;
   const H = 180;
-  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.width  = W * dpr; canvas.height = H * dpr;
   canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
+
   const PAD = { top:10, right:16, bottom:30, left:44 };
   const gW = W - PAD.left - PAD.right;
   const gH = H - PAD.top  - PAD.bottom;
@@ -344,38 +1347,83 @@ function renderChart() {
   const maxV = Math.max(...CHART_DATA.map(d=>d.views),  1);
   const maxY = Math.max(maxC, maxV);
   const xStep = gW / Math.max(CHART_DATA.length - 1, 1);
-  function px(i, val) { return [PAD.left + i * xStep, PAD.top + gH - (val / maxY) * gH]; }
-  // Grid
-  ctx.strokeStyle = 'rgba(48,54,61,.8)'; ctx.lineWidth = 1;
+
+  function px(i, val) {
+    return [PAD.left + i * xStep, PAD.top + gH - (val / maxY) * gH];
+  }
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(79,195,247,0.06)'; ctx.lineWidth = 1;
   for (let t = 0; t <= 4; t++) {
     const y = PAD.top + (gH / 4) * t;
     ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + gW, y); ctx.stroke();
   }
+
+  // Draw filled area under line
+  function drawArea(color, key) {
+    const grad = ctx.createLinearGradient(0, PAD.top, 0, PAD.top + gH);
+    grad.addColorStop(0, color + '22');
+    grad.addColorStop(1, color + '00');
+    ctx.beginPath();
+    CHART_DATA.forEach((d,i) => {
+      const [x,y] = px(i, d[key]);
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.lineTo(PAD.left + gW, PAD.top + gH);
+    ctx.lineTo(PAD.left, PAD.top + gH);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
   function drawLine(color, key) {
     ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 1.5;
-    CHART_DATA.forEach((d,i) => { const [x,y] = px(i,d[key]); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+    CHART_DATA.forEach((d,i) => {
+      const [x,y] = px(i, d[key]);
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
     ctx.stroke();
   }
-  drawLine('#58a6ff','clones'); drawLine('#3fb950','views');
-  // X labels (monthly)
-  ctx.fillStyle = '#8b949e'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+
+  drawArea('#4fc3f7', 'clones');
+  drawArea('#26a69a', 'views');
+  drawLine('#4fc3f7', 'clones');
+  drawLine('#26a69a', 'views');
+
+  // X labels
+  ctx.fillStyle = '#5d7a94'; ctx.font = '10px DM Mono, monospace'; ctx.textAlign = 'center';
   const step = Math.max(1, Math.floor(CHART_DATA.length / 6));
   CHART_DATA.forEach((d,i) => {
     if (i % step === 0) {
-      const [x] = px(i,0);
+      const [x] = px(i, 0);
       ctx.fillText(d.date.slice(0,7), x, H - 8);
     }
   });
+
   // Y label
-  ctx.textAlign = 'right'; ctx.fillText(fmt(maxY), PAD.left - 4, PAD.top + 4);
+  ctx.textAlign = 'right';
+  ctx.fillText(fmt(maxY), PAD.left - 4, PAD.top + 4);
 }
 
+// ── Scroll reveal ─────────────────────────────────────────────────────────────
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+  });
+}, { threshold: 0.08 });
+
+function observeAll() {
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el => io.observe(el));
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
 renderStats();
 renderLangBar();
 renderRepoCards();
 renderTrends();
 renderStarsTable();
 renderChart();
+observeAll();
 window.addEventListener('resize', renderChart);
 </script>
 </body>
