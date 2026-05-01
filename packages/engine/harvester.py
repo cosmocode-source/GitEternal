@@ -259,7 +259,8 @@ async def main() -> None:
                 owner_login = await _log_token_identity(harvest_token, client)
                 if not owner_login:
                     raise RuntimeError(
-                        "HARVEST_TOKEN identity could not be resolved; check token validity/scopes."
+                        "Failed to resolve HARVEST_TOKEN identity. Verify the token is valid and has "
+                        "read access to /user (classic PAT with repo/user scope or fine-grained with read:user)."
                     )
                 pinned: list[str] = [
                     r for r in config.get("tracked_repos", [])
