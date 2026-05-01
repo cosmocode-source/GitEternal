@@ -61,6 +61,7 @@ class RepoMeta(BaseModel):
     lifetime_uniques: int
     available_months: list[str]
     last_harvest: str
+    description: str = ""
 
 
 class VaultIndex(BaseModel):

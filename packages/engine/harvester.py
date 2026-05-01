@@ -125,7 +125,7 @@ async def _log_token_identity(token: str, client: httpx.AsyncClient) -> str:
 # ── repo discovery ────────────────────────────────────────────────────────────
 
 async def _get_all_repos(token: str, client: httpx.AsyncClient) -> list[dict]:
-    """Page through /user/repos and return raw repo objects."""
+    """Page through /user/repos and return only repos owned by the authenticated user."""
     repos: list[dict] = []
     page = 1
     while True:
@@ -135,7 +135,7 @@ async def _get_all_repos(token: str, client: httpx.AsyncClient) -> list[dict]:
             params={
                 "per_page": 100,
                 "page": page,
-                "affiliation": "owner,collaborator,organization_member",
+                "affiliation": "owner",
             },
         )
         if r.status_code != 200:
@@ -160,18 +160,37 @@ async def _can_access_traffic(
     return r.status_code == 200
 
 
-async def _discover_repos(token: str, client: httpx.AsyncClient) -> tuple[list[str], list[str]]:
+async def _discover_repos(
+    token: str, client: httpx.AsyncClient, owner_login: str
+) -> tuple[list[str], list[str], dict[str, str]]:
     all_repos = await _get_all_repos(token, client)
-    logger.info("Found %d repos visible to token", len(all_repos))
+    logger.info("Found %d repos owned by %s", len(all_repos), owner_login)
 
-    candidates = [
-        r["full_name"] for r in all_repos
-        if (r.get("permissions", {}).get("admin") or r.get("permissions", {}).get("push"))
-        and not r.get("private", False)
-    ]
+    # Split public/private — log count only, never log private names
+    private_repos = [r for r in all_repos if r.get("private", False)]
+    public_repos  = [r for r in all_repos if not r.get("private", False)]
     logger.info(
-        "%d repos have push/admin — probing traffic API …",
-        len(candidates),
+        "Repo breakdown: %d public, %d private (private names withheld)",
+        len(public_repos), len(private_repos),
+    )
+
+    # Only harvest public repos owned by the authenticated user
+    candidates = [
+        r["full_name"] for r in public_repos
+        if r["owner"]["login"] == owner_login
+        and (r.get("permissions", {}).get("admin") or r.get("permissions", {}).get("push"))
+    ]
+
+    # Build description map for public user repos
+    descriptions: dict[str, str] = {
+        r["full_name"]: (r.get("description") or "")
+        for r in public_repos
+        if r["owner"]["login"] == owner_login
+    }
+
+    logger.info(
+        "%d public repos owned by %s — probing traffic API …",
+        len(candidates), owner_login,
     )
 
     accessible: list[str] = []
@@ -192,7 +211,7 @@ async def _discover_repos(token: str, client: httpx.AsyncClient) -> tuple[list[s
             else:
                 blocked.append(full_name)
 
-    return sorted(accessible), sorted(blocked)
+    return sorted(accessible), sorted(blocked), descriptions
 
 
 # ── main ──────────────────────────────────────────────────────────────────────
@@ -231,8 +250,6 @@ async def main() -> None:
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
 
-                await _log_token_identity(harvest_token, client)
-
                 rate = await check_rate_limit(harvest_token, client=client)
                 logger.info("Rate limit remaining: %d", rate["remaining"])
                 if rate["remaining"] < 50:
@@ -242,7 +259,8 @@ async def main() -> None:
                 pinned: list[str] = config.get("tracked_repos", [])
                 logger.info("Discovering repos with confirmed traffic API access …")
 
-                accessible, blocked = await _discover_repos(harvest_token, client)
+                owner_login = await _log_token_identity(harvest_token, client)
+                accessible, blocked, descriptions = await _discover_repos(harvest_token, client, owner_login)
 
                 if blocked:
                     logger.warning(
@@ -304,7 +322,7 @@ async def main() -> None:
                         MonthLedger.model_validate(_read_json(tmp_path, {}))
                         tmp_path.replace(month_path)
 
-                        index = update_index(index, full_repo, merged)
+                        index = update_index(index, full_repo, merged, descriptions.get(full_repo, ""))
                         harvested.append(full_repo)
                         logger.info("Done: %s", full_repo)
 

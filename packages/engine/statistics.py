@@ -93,6 +93,7 @@ def _generate_top_repos(index: VaultIndex) -> list[dict[str, Any]]:
     for full_repo, meta in index.repos.items():
         rows.append({
             "repo":             full_repo,
+            "description":      meta.description,
             "lifetime_clones":  meta.lifetime_clones,
             "lifetime_uniques": meta.lifetime_uniques,
             "first_date":       meta.first_date,
@@ -375,6 +376,7 @@ def _render_html(
               <tr>
                 <th>#</th>
                 <th>Repository</th>
+                <th>Description</th>
                 <th>Lifetime Clones</th>
                 <th>Unique Cloners</th>
               </tr>
@@ -470,6 +472,7 @@ function renderTopRepos() {{
       <td style="color:var(--muted)">${{i + 1}}</td>
       <td><a class="repo-link" href="https://github.com/${{r.repo}}" target="_blank">${{repo}}</a>
           <div style="font-size:0.7rem;color:var(--muted)">${{owner}}</div></td>
+      <td style="font-size:0.8rem;color:var(--muted);max-width:240px;">${{r.description || ''}}</td>
       <td>${{fmt(r.lifetime_clones)}}</td>
       <td>${{fmt(r.lifetime_uniques)}}</td>
     </tr>`;

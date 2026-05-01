@@ -76,7 +76,7 @@ def merge_month(
         raise ValueError(str(exc)) from exc
 
 
-def update_index(index: VaultIndex, repo: str, month_ledger: MonthLedger) -> VaultIndex:
+def update_index(index: VaultIndex, repo: str, month_ledger: MonthLedger, description: str = "") -> VaultIndex:
     clones = [entry.model_dump(mode="json") for entry in month_ledger.clones]
     clone_days = len(clones)
     clone_total = sum(item["count"] for item in clones)
@@ -123,6 +123,7 @@ def update_index(index: VaultIndex, repo: str, month_ledger: MonthLedger) -> Vau
         lifetime_uniques=lifetime_uniques,
         available_months=available_months,
         last_harvest=datetime.now(tz=UTC).isoformat(),
+        description=description if description else (existing.description if existing else ""),
     )
 
     repos = dict(index.repos)
