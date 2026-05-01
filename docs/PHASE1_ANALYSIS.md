@@ -2,11 +2,11 @@
 
 ## Architecture Overview
 
-GitEternal_v2 is a **GitHub traffic analytics system** with three layers:
+GitEternal is a **GitHub traffic analytics system** with three layers:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  GitEternal_v2 (main repo)                                      │
+│  GitEternal (main repo)                                      │
 │   └── packages/engine/  ← Python harvester                  │
 │   └── apps/web/         ← Next.js dashboard (Vercel-hosted) │
 │   └── .github/workflows/harvest.yml ← scheduled runner      │
@@ -49,5 +49,5 @@ GitEternal_v2 is a **GitHub traffic analytics system** with three layers:
 
 - The web app (Next.js + NextAuth) requires user login (GitHub OAuth) and reads vault data via GitHub Contents API with Upstash KV caching
 - The system was originally designed for a **self-hosted model** where the user provides their own PAT and vault repo
-- GitHub's traffic API only returns the **last 14 days** — the entire point of GitEternal_v2 is to harvest before data expires, building a longer history
+- GitHub's traffic API only returns the **last 14 days** — the entire point of GitEternal is to harvest before data expires, building a longer history
 - Schema is strictly validated via Pydantic (`schema.py`) on both write and read paths

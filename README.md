@@ -22,8 +22,8 @@
 
 <br />
 
-[![Harvest](https://img.shields.io/github/actions/workflow/status/cosmocode-source/GitEternal_v2/01-harvester.yml?label=Harvest&logo=github-actions&logoColor=white&style=flat-square)](https://github.com/cosmocode-source/GitEternal_v2/actions/workflows/01-harvester.yml)
-[![Statistics](https://img.shields.io/github/actions/workflow/status/cosmocode-source/GitEternal_v2/02-statistics.yml?label=Statistics&logo=github-actions&logoColor=white&style=flat-square)](https://github.com/cosmocode-source/GitEternal_v2/actions/workflows/02-statistics.yml)
+[![Harvest](https://img.shields.io/github/actions/workflow/status/cosmocode-source/GitEternal/01-harvester.yml?label=Harvest&logo=github-actions&logoColor=white&style=flat-square)](https://github.com/cosmocode-source/GitEternal/actions/workflows/01-harvester.yml)
+[![Statistics](https://img.shields.io/github/actions/workflow/status/cosmocode-source/GitEternal/02-statistics.yml?label=Statistics&logo=github-actions&logoColor=white&style=flat-square)](https://github.com/cosmocode-source/GitEternal/actions/workflows/02-statistics.yml)
 [![Dashboard](https://img.shields.io/badge/Dashboard-Live-brightgreen?style=flat-square&logo=github)](https://cosmocode-source.github.io/My-Git-Statistics)
 
 </div>
@@ -36,7 +36,7 @@ GitHub's traffic API is powerful but brutally short-sighted — it only retains 
 
 ## The Solution
 
-GitEternal_v2 runs a weekly automated harvest *before* your data expires, commits it into a private Git repository that acts as a flat-file database, and builds a public GitHub Pages dashboard from aggregated reports — all without touching any infrastructure outside GitHub itself.
+GitEternal runs a weekly automated harvest *before* your data expires, commits it into a private Git repository that acts as a flat-file database, and builds a public GitHub Pages dashboard from aggregated reports — all without touching any infrastructure outside GitHub itself.
 
 No servers. No cloud databases. No subscription. No external credentials. Just Git.
 
@@ -49,7 +49,7 @@ No servers. No cloud databases. No subscription. No external credentials. Just G
 │                        YOUR GITHUB ACCOUNT                           │
 │                                                                      │
 │  ┌─────────────────────┐      ┌────────────────────────┐            │
-│  │     GitEternal_v2      │      │   GitData     │ ← PRIVATE  │
+│  │     GitEternal      │      │   GitData     │ ← PRIVATE  │
 │  │     (this repo)     │─────▶│                        │            │
 │  │                     │      │  index.json            │            │
 │  │  packages/engine/   │      │  harvest_log.json      │            │
@@ -83,7 +83,7 @@ No servers. No cloud databases. No subscription. No external credentials. Just G
 
 | Repository | Visibility | Role |
 |---|---|---|
-| `GitEternal_v2` | Private | Engine code, workflow definitions, Python harvester |
+| `GitEternal` | Private | Engine code, workflow definitions, Python harvester |
 | `GitData` | **Private** | Raw traffic vault — daily clones, views, referrers per repo |
 | `My-Git-Statistics` | Public | Aggregated dashboard served via GitHub Pages |
 
@@ -139,7 +139,7 @@ No servers. No cloud databases. No subscription. No external credentials. Just G
 ## Repository Structure
 
 ```
-GitEternal_v2/
+GitEternal/
 │
 ├── .github/
 │   └── workflows/
@@ -452,8 +452,8 @@ The `harvest.lock` file auto-expires after 2 hours. If a run was interrupted, th
 
 ```bash
 # Clone and set up
-git clone https://github.com/YOUR_USERNAME/GitEternal_v2.git
-cd GitEternal_v2
+git clone https://github.com/YOUR_USERNAME/GitEternal.git
+cd GitEternal
 pip install -r packages/engine/requirements.txt
 
 # Run tests
@@ -492,6 +492,6 @@ Just Python, Git, and GitHub Actions.
 
 <br /><br />
 
-**⭐ Star this repo if GitEternal_v2 is useful to you.**
+**⭐ Star this repo if GitEternal is useful to you.**
 
 </div>

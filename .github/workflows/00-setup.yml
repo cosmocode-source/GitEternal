@@ -73,7 +73,7 @@ jobs:
           else
             gh repo create "$FULL" \
               --private \
-              --description "GitEternal_v2 data vault — auto-managed, do not edit manually"
+              --description "GitEternal data vault — auto-managed, do not edit manually"
             echo "✅  Created $FULL (private)"
           fi
           echo "full_name=$FULL" >> $GITHUB_OUTPUT
@@ -100,7 +100,7 @@ jobs:
           cat > README.md <<EOF
           # GitData
 
-          This repository is the **data vault** for [GitEternal_v2](https://github.com/$OWNER/GitEternal_v2).
+          This repository is the **data vault** for [GitEternal](https://github.com/$OWNER/GitEternal).
 
           It is automatically managed by the harvester workflow. **Do not edit files manually.**
 
@@ -144,7 +144,7 @@ jobs:
           else
             gh repo create "$FULL" \
               --public \
-              --description "GitEternal_v2 statistics dashboard — auto-generated, view at https://$OWNER.github.io/$REPO"
+              --description "GitEternal statistics dashboard — auto-generated, view at https://$OWNER.github.io/$REPO"
             echo "✅  Created $FULL (public)"
           fi
           echo "full_name=$FULL" >> $GITHUB_OUTPUT
@@ -174,7 +174,7 @@ jobs:
 
           📊 **[View Dashboard →](https://$OWNER.github.io/$REPO)**
 
-          Updated weekly by [GitEternal_v2](https://github.com/$OWNER/GitEternal_v2).
+          Updated weekly by [GitEternal](https://github.com/$OWNER/GitEternal).
           EOF
 
           # Placeholder dashboard HTML (will be overwritten by 02-statistics.yml)
@@ -184,7 +184,7 @@ jobs:
           <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>GitEternal_v2 Statistics</title>
+            <title>GitEternal Statistics</title>
             <style>
               * { margin: 0; padding: 0; box-sizing: border-box; }
               body {
@@ -210,7 +210,7 @@ jobs:
           <body>
             <div class="container">
               <div class="logo">⏳</div>
-              <h1>GitEternal_v2 Statistics</h1>
+              <h1>GitEternal Statistics</h1>
               <p>Dashboard initializing — first harvest hasn't run yet.</p>
               <div class="badge">
                 <span class="spinner"></span>

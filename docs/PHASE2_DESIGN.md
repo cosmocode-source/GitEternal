@@ -2,7 +2,7 @@
 
 ## Problem Recap
 
-Users won't provide account credentials (PAT), so the original model of "give me your HARVEST_TOKEN and I'll collect your data" is not viable for a public deployment. The new model shifts to **self-sovereign, GitHub-native analytics** — users fork/use GitEternal_v2 in their own GitHub account and data never leaves GitHub.
+Users won't provide account credentials (PAT), so the original model of "give me your HARVEST_TOKEN and I'll collect your data" is not viable for a public deployment. The new model shifts to **self-sovereign, GitHub-native analytics** — users fork/use GitEternal in their own GitHub account and data never leaves GitHub.
 
 ---
 
@@ -13,7 +13,7 @@ Users won't provide account credentials (PAT), so the original model of "give me
 │  USER'S GITHUB ACCOUNT                                                      │
 │                                                                             │
 │  ┌─────────────────────────┐     ┌─────────────────────────┐               │
-│  │  GitEternal_v2 (main)      │     │  GitData       │               │
+│  │  GitEternal (main)      │     │  GitData       │               │
 │  │  (forked/cloned)        │     │  (auto-created)         │               │
 │  │                         │     │                         │               │
 │  │  packages/engine/  ─────┼─────►  index.json            │               │
@@ -159,7 +159,7 @@ GitHub Traffic API
 |---|---|---|
 | Privacy | `GitData` is private | GitHub Pages requires public repo for free tier; stats repo is public but contains only aggregated reports, not raw daily data |
 | No external infra | Everything in GitHub Actions + Pages | Slower updates (weekly), no real-time data |
-| Commit bloat | Statistics writes to a separate repo | Main GitEternal_v2 repo stays clean; `GitData` grows ~1 commit/week |
+| Commit bloat | Statistics writes to a separate repo | Main GitEternal repo stays clean; `GitData` grows ~1 commit/week |
 | Token scope | User provides their own PAT | Minimal: `repo` scope for traffic API + fine-grained write tokens for the two data repos |
 | Setup friction | One manual workflow dispatch | ~5 min setup; no CLI, no external tools required |
 | Orphan repos | `GitData` and `My-Git-Statistics` have no common history with main | Clean separation; neither pollutes the main repo's history |
@@ -170,7 +170,7 @@ GitHub Traffic API
 ## File/Workflow Structure
 
 ```
-GitEternal_v2/
+GitEternal/
 ├── .github/
 │   └── workflows/
 │       ├── 00-setup.yml          ← one-time setup (deletes itself)

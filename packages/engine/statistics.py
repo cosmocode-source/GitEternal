@@ -219,7 +219,7 @@ def _render_html(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{owner} · GitEternal_v2 Statistics</title>
+  <title>{owner} · GitEternal Statistics</title>
   <style>
     *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
 
@@ -487,7 +487,7 @@ def _render_html(
 </main>
 
 <footer class="footer">
-  Powered by <a href="https://github.com/{owner}/GitEternal" target="_blank">GitEternal_v2</a>
+  Powered by <a href="https://github.com/{owner}/GitEternal" target="_blank">GitEternal</a>
   — data stored privately, dashboard auto-generated weekly.
 </footer>
 
@@ -745,7 +745,7 @@ def generate(vault_path: Path, output_path: Path, owner: str | None = None) -> N
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate GitEternal_v2 statistics reports")
+    parser = argparse.ArgumentParser(description="Generate GitEternal statistics reports")
     parser.add_argument("--vault",  required=True, help="Path to GitData clone")
     parser.add_argument("--output", required=True, help="Path to write output files")
     parser.add_argument("--owner",  default=None,  help="GitHub owner login (auto-detected if omitted)")

@@ -94,7 +94,7 @@ def _append_log(vault_path: Path, run: HarvestRun) -> None:
 def _gh_headers(token: str) -> dict[str, str]:
     return {
         "Authorization": f"Bearer {token}",
-        "User-Agent": "GitEternal_v2/1.0",
+        "User-Agent": "GitEternal/1.0",
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
     }
