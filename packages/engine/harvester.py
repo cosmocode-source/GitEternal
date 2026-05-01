@@ -247,7 +247,7 @@ async def main() -> None:
         skipped_403: list[str] = []
         repo_errors: list[str] = []
 
-        owner_login = ""
+        owner_login: str | None = None
 
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
