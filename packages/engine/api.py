@@ -124,3 +124,23 @@ async def check_rate_limit(token: str, *, client: httpx.AsyncClient) -> dict[str
         reset_at = datetime.fromtimestamp(reset, tz=UTC).isoformat() if reset else "unknown"
         logger.warning("GitHub rate limit low: remaining=%s reset=%s", remaining, reset_at)
     return {"remaining": remaining, "reset": reset}
+
+
+async def fetch_repo_info(
+    owner: str,
+    repo: str,
+    token: str,
+    *,
+    client: httpx.AsyncClient,
+) -> dict[str, Any]:
+    """Fetch repo metadata: stars, forks, watchers, language, topics, open issues."""
+    data = await _get_json(client, f"/repos/{owner}/{repo}", token)
+    return {
+        "stars":       data.get("stargazers_count", 0),
+        "forks":       data.get("forks_count", 0),
+        "watchers":    data.get("subscribers_count", 0),
+        "open_issues": data.get("open_issues_count", 0),
+        "language":    data.get("language") or "",
+        "topics":      data.get("topics", []),
+        "description": data.get("description") or "",
+    }

@@ -62,6 +62,12 @@ class RepoMeta(BaseModel):
     available_months: list[str]
     last_harvest: str
     description: str = ""
+    stars: int = 0
+    forks: int = 0
+    watchers: int = 0
+    open_issues: int = 0
+    language: str = ""
+    topics: list[str] = []
 
 
 class VaultIndex(BaseModel):

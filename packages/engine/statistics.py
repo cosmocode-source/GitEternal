@@ -73,8 +73,11 @@ def _load_all_ledgers(vault: Path, full_repo: str) -> list[MonthLedger]:
 
 # ── Report generators ─────────────────────────────────────────────────────────
 
-def _generate_summary(index: VaultIndex) -> dict[str, Any]:
-    repos = index.repos
+def _generate_summary(index: VaultIndex, owner: str = "") -> dict[str, Any]:
+    repos = {
+        k: v for k, v in index.repos.items()
+        if not owner or k.split("/")[0] == owner
+    }
     total_clones  = sum(m.lifetime_clones  for m in repos.values())
     total_uniques = sum(m.lifetime_uniques for m in repos.values())
     most_active   = max(repos, key=lambda r: repos[r].lifetime_clones) if repos else None
@@ -88,9 +91,12 @@ def _generate_summary(index: VaultIndex) -> dict[str, Any]:
     }
 
 
-def _generate_top_repos(index: VaultIndex) -> list[dict[str, Any]]:
+def _generate_top_repos(index: VaultIndex, owner: str = "") -> list[dict[str, Any]]:
     rows = []
     for full_repo, meta in index.repos.items():
+        # Skip repos not owned by the user (stale org entries in vault)
+        if owner and full_repo.split("/")[0] != owner:
+            continue
         rows.append({
             "repo":             full_repo,
             "description":      meta.description,
@@ -100,6 +106,12 @@ def _generate_top_repos(index: VaultIndex) -> list[dict[str, Any]]:
             "last_date":        meta.last_date,
             "last_harvest":     meta.last_harvest,
             "available_months": len(meta.available_months),
+            "stars":            meta.stars,
+            "forks":            meta.forks,
+            "watchers":         meta.watchers,
+            "open_issues":      meta.open_issues,
+            "language":         meta.language,
+            "topics":           meta.topics,
         })
     return sorted(rows, key=lambda r: r["lifetime_clones"], reverse=True)
 
@@ -309,6 +321,87 @@ def _render_html(
     .repo-link {{ color: var(--blue); text-decoration: none; font-weight: 500; }}
     .repo-link:hover {{ text-decoration: underline; }}
 
+    /* Repo cards grid */
+    .repos-section {{
+      margin-bottom: 1rem;
+    }}
+    .repos-section .card-header {{
+      padding: 1rem 1.25rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      color: #f0f6fc;
+      font-size: 0.9375rem;
+      background: var(--surface);
+      border-radius: var(--radius) var(--radius) 0 0;
+      border: 1px solid var(--border);
+      border-bottom: none;
+    }}
+    .repo-cards {{
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      padding: 1rem 0;
+    }}
+    .repo-card {{
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: border-color 0.15s;
+    }}
+    .repo-card:hover {{ border-color: var(--blue); }}
+    .repo-card-title {{
+      font-weight: 600;
+      font-size: 0.9375rem;
+    }}
+    .repo-card-title a {{ color: var(--blue); text-decoration: none; }}
+    .repo-card-title a:hover {{ text-decoration: underline; }}
+    .repo-card-desc {{
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.45;
+      flex: 1;
+    }}
+    .repo-card-lang {{
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }}
+    .lang-dot {{
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--orange);
+      flex-shrink: 0;
+    }}
+    .repo-card-meta {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }}
+    .repo-card-meta span {{ display: flex; align-items: center; gap: 0.25rem; }}
+    .repo-card-topics {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.1rem;
+    }}
+    .topic-tag {{
+      background: rgba(88,166,255,.1);
+      color: var(--blue);
+      border-radius: 20px;
+      padding: 0.1rem 0.5rem;
+      font-size: 0.7rem;
+    }}
+
     .badge {{
       display: inline-block;
       padding: 0.15rem 0.5rem;
@@ -365,45 +458,28 @@ def _render_html(
     </div>
   </div>
 
-  <div class="grid-2">
-    <!-- Top repos table -->
-    <div class="card">
-      <div class="card-header">Top Repositories by Clones</div>
-      <div class="card-body" style="padding:0;">
-        <div class="table-wrap">
-          <table id="top-repos-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Repository</th>
-                <th>Description</th>
-                <th>Lifetime Clones</th>
-                <th>Unique Cloners</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+  <!-- Repo cards -->
+  <div class="repos-section">
+    <div class="card-header">Repositories</div>
+    <div class="repo-cards" id="repo-cards"></div>
+  </div>
 
-    <!-- Trends table -->
-    <div class="card">
-      <div class="card-header">Week-over-Week Trends</div>
-      <div class="card-body" style="padding:0;">
-        <div class="table-wrap">
-          <table id="trends-table">
-            <thead>
-              <tr>
-                <th>Repository</th>
-                <th>This Week</th>
-                <th>Last Week</th>
-                <th>Change</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+  <!-- Trends table -->
+  <div class="card mb-1">
+    <div class="card-header">Week-over-Week Trends</div>
+    <div class="card-body" style="padding:0;">
+      <div class="table-wrap">
+        <table id="trends-table">
+          <thead>
+            <tr>
+              <th>Repository</th>
+              <th>This Week</th>
+              <th>Last Week</th>
+              <th>Change</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -463,19 +539,47 @@ function renderSummary() {{
   }}
 }}
 
-// ── Top repos table ───────────────────────────────────────────────────────────
-function renderTopRepos() {{
-  const tbody = document.querySelector('#top-repos-table tbody');
-  tbody.innerHTML = TOP_REPOS.slice(0, 15).map((r, i) => {{
-    const [owner, repo] = r.repo.split('/');
-    return `<tr>
-      <td style="color:var(--muted)">${{i + 1}}</td>
-      <td><a class="repo-link" href="https://github.com/${{r.repo}}" target="_blank">${{repo}}</a>
-          <div style="font-size:0.7rem;color:var(--muted)">${{owner}}</div></td>
-      <td style="font-size:0.8rem;color:var(--muted);max-width:240px;">${{r.description || ''}}</td>
-      <td>${{fmt(r.lifetime_clones)}}</td>
-      <td>${{fmt(r.lifetime_uniques)}}</td>
-    </tr>`;
+// ── Repo cards ─────────────────────────────────────────────────────────────────
+function renderRepoCards() {{
+  const container = document.getElementById('repo-cards');
+  if (!container || !TOP_REPOS.length) return;
+
+  const langColors = {{
+    'Python':'#3572A5','JavaScript':'#f1e05a','TypeScript':'#2b7489','Java':'#b07219',
+    'C++':'#f34b7d','C':'#555555','Go':'#00ADD8','Rust':'#dea584','Ruby':'#701516',
+    'PHP':'#4F5D95','Shell':'#89e051','Kotlin':'#F18E33','Swift':'#ffac45',
+    'HTML':'#e34c26','CSS':'#563d7c','Dart':'#00B4AB','Scala':'#c22d40',
+    'Vue':'#2c3e50','C#':'#178600',
+  }};
+
+  container.innerHTML = TOP_REPOS.map(r => {{
+    const [, repo] = r.repo.split('/');
+    const desc  = r.description ? `<div class="repo-card-desc">${{r.description}}</div>` : '';
+    const lang  = r.language
+      ? `<div class="repo-card-lang">
+           <span class="lang-dot" style="background:${{langColors[r.language] || 'var(--muted)'}};"></span>
+           ${{r.language}}
+         </div>`
+      : '';
+    const topics = r.topics && r.topics.length
+      ? `<div class="repo-card-topics">${{r.topics.slice(0,4).map(t => `<span class="topic-tag">${{t}}</span>`).join('')}}</div>`
+      : '';
+    return `
+      <div class="repo-card">
+        <div class="repo-card-title">
+          <a href="https://github.com/${{r.repo}}" target="_blank">${{repo}}</a>
+        </div>
+        ${{desc}}
+        ${{lang}}
+        <div class="repo-card-meta">
+          <span>⭐ ${{fmt(r.stars)}}</span>
+          <span>🍴 ${{fmt(r.forks)}}</span>
+          <span>👁 ${{fmt(r.watchers)}}</span>
+          <span>🔵 ${{fmt(r.lifetime_clones)}} clones</span>
+          ${{r.open_issues ? `<span>⚠ ${{r.open_issues}} issues</span>` : ''}}
+        </div>
+        ${{topics}}
+      </div>`;
   }}).join('');
 }}
 
@@ -596,7 +700,7 @@ function renderChart() {{
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 renderSummary();
-renderTopRepos();
+renderRepoCards();
 renderTrends();
 renderChart();
 window.addEventListener('resize', renderChart);
@@ -618,8 +722,8 @@ def generate(vault_path: Path, output_path: Path, owner: str | None = None) -> N
 
     logger.info("Generating reports for %d repos (owner=%s)", len(index.repos), owner)
 
-    summary    = _generate_summary(index)
-    top_repos  = _generate_top_repos(index)
+    summary    = _generate_summary(index, owner)
+    top_repos  = _generate_top_repos(index, owner)
     trends     = _generate_trends(vault_path, index)
     chart_data = _collect_chart_data(vault_path, index)
 

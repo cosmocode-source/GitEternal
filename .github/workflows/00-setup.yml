@@ -294,6 +294,7 @@ jobs:
 
       # ── Self-destruct ─────────────────────────────────────────────────────
       - name: Delete this setup workflow
+        if: false  # need to turn this to true so that the auto delete works properly, this si false for testing purposes.
         run: |
           MAIN_REPO="${{ github.repository }}"
           # Delete the workflow file via API so it doesn't clutter the Actions tab

@@ -27,7 +27,7 @@ from typing import Any
 
 import httpx
 
-from .api import check_rate_limit, fetch_clones, fetch_referrers, fetch_views
+from .api import check_rate_limit, fetch_clones, fetch_referrers, fetch_repo_info, fetch_views
 from .lock import acquire_lock, release_lock
 from .merge import merge_month, update_index
 from .schema import HarvestLog, HarvestRun, MonthLedger, VaultIndex
@@ -256,7 +256,10 @@ async def main() -> None:
                     release_lock(vault_path)
                     raise RuntimeError(f"Rate limit too low: {rate['remaining']} remaining")
 
-                pinned: list[str] = config.get("tracked_repos", [])
+                pinned: list[str] = [
+                    r for r in config.get("tracked_repos", [])
+                    if r.split("/")[0] == owner_login
+                ]
                 logger.info("Discovering repos with confirmed traffic API access …")
 
                 owner_login = await _log_token_identity(harvest_token, client)
@@ -304,6 +307,12 @@ async def main() -> None:
                         views = await fetch_views(owner, repo, harvest_token, client=client)
 
                         try:
+                            repo_info = await fetch_repo_info(owner, repo, harvest_token, client=client)
+                        except Exception as exc:
+                            logger.warning("Repo info failed for %s: %s", full_repo, exc)
+                            repo_info = {}
+
+                        try:
                             referrers = await fetch_referrers(owner, repo, harvest_token, client=client)
                         except Exception as exc:
                             logger.warning("Referrers failed for %s: %s", full_repo, exc)
@@ -322,7 +331,17 @@ async def main() -> None:
                         MonthLedger.model_validate(_read_json(tmp_path, {}))
                         tmp_path.replace(month_path)
 
-                        index = update_index(index, full_repo, merged, descriptions.get(full_repo, ""))
+                        index = update_index(
+                            index, full_repo, merged,
+                            vault_path=vault_path,
+                            description=repo_info.get("description", descriptions.get(full_repo, "")),
+                            stars=repo_info.get("stars", 0),
+                            forks=repo_info.get("forks", 0),
+                            watchers=repo_info.get("watchers", 0),
+                            open_issues=repo_info.get("open_issues", 0),
+                            language=repo_info.get("language", ""),
+                            topics=repo_info.get("topics", []),
+                        )
                         harvested.append(full_repo)
                         logger.info("Done: %s", full_repo)
 
