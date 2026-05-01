@@ -114,3 +114,14 @@ jobs:
           REPO=$(echo  "${{ github.repository }}" | cut -d'/' -f2)
           echo ""
           echo "📊 Dashboard: https://${OWNER}.github.io/${REPO}"
+
+        - name: Update repo website link
+          env:
+            GH_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
+          run: |
+            OWNER=$(echo "${{ github.repository }}" | cut -d'/' -f1)
+            REPO=$(echo  "${{ github.repository }}" | cut -d'/' -f2)
+            gh api \
+              --method PATCH \
+              "/repos/$OWNER/$REPO" \
+              -f "homepage=https://${OWNER}.github.io/${REPO}"
