@@ -22,9 +22,9 @@
 
 <br />
 
-[![Harvest](https://img.shields.io/github/actions/workflow/status/YOUR_USERNAME/GitEternal_v2/01-harvester.yml?label=Harvest&logo=github-actions&logoColor=white&style=flat-square)](https://github.com/YOUR_USERNAME/GitEternal_v2/actions/workflows/01-harvester.yml)
-[![Statistics](https://img.shields.io/github/actions/workflow/status/YOUR_USERNAME/GitEternal_v2/02-statistics.yml?label=Statistics&logo=github-actions&logoColor=white&style=flat-square)](https://github.com/YOUR_USERNAME/GitEternal_v2/actions/workflows/02-statistics.yml)
-[![Dashboard](https://img.shields.io/badge/Dashboard-Live-brightgreen?style=flat-square&logo=github)](https://YOUR_USERNAME.github.io/My-Git-Statistics)
+[![Harvest](https://img.shields.io/github/actions/workflow/status/cosmocode-source/GitEternal_v2/01-harvester.yml?label=Harvest&logo=github-actions&logoColor=white&style=flat-square)](https://github.com/cosmocode-source/GitEternal_v2/actions/workflows/01-harvester.yml)
+[![Statistics](https://img.shields.io/github/actions/workflow/status/cosmocode-source/GitEternal_v2/02-statistics.yml?label=Statistics&logo=github-actions&logoColor=white&style=flat-square)](https://github.com/cosmocode-source/GitEternal_v2/actions/workflows/02-statistics.yml)
+[![Dashboard](https://img.shields.io/badge/Dashboard-Live-brightgreen?style=flat-square&logo=github)](https://cosmocode-source.github.io/My-Git-Statistics)
 
 </div>
 
