@@ -1,5 +1,5 @@
 {
-  "checksum": "sha256:e2d73efb8a4f2b815f44040012e8b3ae6952394044e4a3a9462bd819e97bad51",
+  "checksum": "sha256:0f7c31d8746be19637394513f8cdd360f712e775db372e6c41f430ba7e24920e",
   "clones": [
     {
       "count": 109,
@@ -69,6 +69,26 @@
     {
       "count": 1,
       "date": "2026-04-30",
+      "uniques": 1
+    },
+    {
+      "count": 1,
+      "date": "2026-05-01",
+      "uniques": 1
+    },
+    {
+      "count": 1,
+      "date": "2026-05-02",
+      "uniques": 1
+    },
+    {
+      "count": 1,
+      "date": "2026-05-03",
+      "uniques": 1
+    },
+    {
+      "count": 2,
+      "date": "2026-05-04",
       "uniques": 1
     }
   ],
@@ -144,6 +164,26 @@
     {
       "count": 0,
       "date": "2026-04-30",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-01",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-02",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-03",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-04",
       "uniques": 0
     }
   ]
