@@ -31,6 +31,15 @@
       "repos_harvested": [],
       "status": "failed",
       "timestamp": "2026-05-03T08:06:45.545070+00:00"
+    },
+    {
+      "error": "cannot access local variable 'owner_login' where it is not associated with a value",
+      "gaps_detected": [],
+      "gaps_permanent": [],
+      "gaps_recovered": [],
+      "repos_harvested": [],
+      "status": "failed",
+      "timestamp": "2026-05-05T07:44:22.657268+00:00"
     }
   ]
 }
