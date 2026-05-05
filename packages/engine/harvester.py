@@ -256,14 +256,15 @@ async def main() -> None:
                     release_lock(vault_path)
                     raise RuntimeError(f"Rate limit too low: {rate['remaining']} remaining")
 
-                pinned: list[str] = [
-                    r for r in config.get("tracked_repos", [])
-                    if r.split("/")[0] == owner_login
-                ]
                 logger.info("Discovering repos with confirmed traffic API access …")
 
                 owner_login = await _log_token_identity(harvest_token, client)
                 accessible, blocked, descriptions = await _discover_repos(harvest_token, client, owner_login)
+
+                pinned: list[str] = [
+                    r for r in config.get("tracked_repos", [])
+                    if r.split("/")[0] == owner_login
+                ]
 
                 if blocked:
                     logger.warning(
