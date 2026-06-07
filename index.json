@@ -2,236 +2,249 @@
   "repos": {
     "cosmocode-source/EscapeRoom-Game": {
       "available_months": [
-        "2026-05"
+        "2026-05",
+        "2026-06"
       ],
       "description": "A text based adventure game for a first year C mini  project. ",
       "first_date": "2026-04-17",
       "forks": 0,
       "language": "C",
-      "last_date": "2026-05-30",
-      "last_harvest": "2026-05-31T08:52:34.654282+00:00",
-      "lifetime_clones": 15,
-      "lifetime_uniques": 14,
+      "last_date": "2026-06-06",
+      "last_harvest": "2026-06-07T09:21:24.100757+00:00",
+      "lifetime_clones": 19,
+      "lifetime_uniques": 18,
       "open_issues": 0,
       "stars": 0,
       "topics": [],
-      "total_clone_days": 44,
+      "total_clone_days": 51,
       "watchers": 1
     },
     "cosmocode-source/EscapeRoomGameOnline": {
       "available_months": [
-        "2026-05"
+        "2026-05",
+        "2026-06"
       ],
       "description": "This the website version of the before made C text based adventurous game that I made for my first year project.",
       "first_date": "2026-04-17",
       "forks": 0,
       "language": "JavaScript",
-      "last_date": "2026-05-30",
-      "last_harvest": "2026-05-31T08:52:35.256698+00:00",
-      "lifetime_clones": 8,
-      "lifetime_uniques": 8,
+      "last_date": "2026-06-06",
+      "last_harvest": "2026-06-07T09:21:24.746475+00:00",
+      "lifetime_clones": 10,
+      "lifetime_uniques": 10,
       "open_issues": 0,
       "stars": 0,
       "topics": [],
-      "total_clone_days": 44,
+      "total_clone_days": 51,
       "watchers": 0
     },
     "cosmocode-source/GitEternal": {
       "available_months": [
-        "2026-05"
+        "2026-05",
+        "2026-06"
       ],
       "description": "This repo is for generating GitHub statistics that get erased every 14-day. ",
       "first_date": "2026-04-17",
       "forks": 0,
       "language": "Python",
-      "last_date": "2026-05-30",
-      "last_harvest": "2026-05-31T08:52:35.923436+00:00",
-      "lifetime_clones": 363,
-      "lifetime_uniques": 169,
+      "last_date": "2026-06-06",
+      "last_harvest": "2026-06-07T09:21:25.362784+00:00",
+      "lifetime_clones": 387,
+      "lifetime_uniques": 184,
       "open_issues": 2,
       "stars": 0,
       "topics": [],
-      "total_clone_days": 44,
+      "total_clone_days": 51,
       "watchers": 0
     },
     "cosmocode-source/Hand-Gesture-Based-Media-Mouse-Control": {
       "available_months": [
-        "2026-05"
+        "2026-05",
+        "2026-06"
       ],
       "description": "Gesture-controlled system that uses a webcam and MediaPipe hand tracking to control media playback and mouse actions in real time.                                                            Includes a web UI, FastAPI backend, mode switching (MEDIA/MOUSE), finger-based gestures, and OS-level control via PyAutoGUI.",
       "first_date": "2026-04-17",
       "forks": 0,
       "language": "",
-      "last_date": "2026-05-30",
-      "last_harvest": "2026-05-31T08:52:36.584062+00:00",
+      "last_date": "2026-06-06",
+      "last_harvest": "2026-06-07T09:21:26.111898+00:00",
       "lifetime_clones": 35,
       "lifetime_uniques": 31,
       "open_issues": 1,
       "stars": 0,
       "topics": [],
-      "total_clone_days": 44,
+      "total_clone_days": 51,
       "watchers": 0
     },
     "cosmocode-source/KochiConnect": {
       "available_months": [
-        "2026-05"
+        "2026-05",
+        "2026-06"
       ],
       "description": "Contains a sample site with the info and reference links we used for the Smart India Hackathon",
       "first_date": "2026-04-17",
       "forks": 0,
       "language": "HTML",
-      "last_date": "2026-05-30",
-      "last_harvest": "2026-05-31T08:52:37.362372+00:00",
-      "lifetime_clones": 20,
-      "lifetime_uniques": 16,
+      "last_date": "2026-06-06",
+      "last_harvest": "2026-06-07T09:21:26.724489+00:00",
+      "lifetime_clones": 21,
+      "lifetime_uniques": 17,
       "open_issues": 0,
       "stars": 0,
       "topics": [],
-      "total_clone_days": 44,
+      "total_clone_days": 51,
       "watchers": 0
     },
     "cosmocode-source/LAN-Network-Analyzer-For-Multiple-Devices": {
       "available_months": [
-        "2026-05"
+        "2026-05",
+        "2026-06"
       ],
       "description": "In this repo we just connect to same LAN and download files from a server desktop to Multiple client desktops.  This gives us a detailed report on the throughput, latency, download time and traffic trend on the network. This project majorly focuses on LAN networks. ",
       "first_date": "2026-04-17",
       "forks": 0,
       "language": "Python",
-      "last_date": "2026-05-30",
-      "last_harvest": "2026-05-31T08:52:37.977147+00:00",
-      "lifetime_clones": 27,
-      "lifetime_uniques": 27,
+      "last_date": "2026-06-06",
+      "last_harvest": "2026-06-07T09:21:27.301487+00:00",
+      "lifetime_clones": 29,
+      "lifetime_uniques": 29,
       "open_issues": 0,
       "stars": 0,
       "topics": [],
-      "total_clone_days": 44,
+      "total_clone_days": 51,
       "watchers": 0
     },
     "cosmocode-source/Multi-Cloud-Security-Management": {
       "available_months": [
-        "2026-05"
+        "2026-05",
+        "2026-06"
       ],
       "description": "A Flask-based web application that automatically detects, audits, and remediates misconfigurations across multiple cloud environments.",
       "first_date": "2026-04-17",
       "forks": 0,
       "language": "Shell",
-      "last_date": "2026-05-30",
-      "last_harvest": "2026-05-31T08:52:38.566503+00:00",
-      "lifetime_clones": 13,
-      "lifetime_uniques": 13,
+      "last_date": "2026-06-06",
+      "last_harvest": "2026-06-07T09:21:28.024642+00:00",
+      "lifetime_clones": 15,
+      "lifetime_uniques": 15,
       "open_issues": 0,
       "stars": 0,
       "topics": [],
-      "total_clone_days": 44,
+      "total_clone_days": 51,
       "watchers": 0
     },
     "cosmocode-source/Network_Download_Analyzer": {
       "available_months": [
-        "2026-05"
+        "2026-05",
+        "2026-06"
       ],
       "description": "This project measures internet download performance over time. A Python program automatically downloads a 100MB test file from different servers and records information like download speed, latency, and connection time. The data is stored in a database and shown in a dashboard where we can see how the network performance changes during the day.",
       "first_date": "2026-04-17",
       "forks": 0,
       "language": "Python",
-      "last_date": "2026-05-30",
-      "last_harvest": "2026-05-31T08:52:39.190167+00:00",
-      "lifetime_clones": 21,
-      "lifetime_uniques": 21,
+      "last_date": "2026-06-06",
+      "last_harvest": "2026-06-07T09:21:28.621730+00:00",
+      "lifetime_clones": 24,
+      "lifetime_uniques": 24,
       "open_issues": 0,
       "stars": 0,
       "topics": [],
-      "total_clone_days": 44,
+      "total_clone_days": 51,
       "watchers": 0
     },
     "cosmocode-source/OS-Jackfruit": {
       "available_months": [
-        "2026-05"
+        "2026-05",
+        "2026-06"
       ],
       "description": "This repo is for the Operating Systems assignment given by PES University.  The task here was to create the engine.c and monitor.c which works as user level manager and Linux Kernal Module. Both the files are used to make local containers on the ubuntu machine with specific requirements. Both requirements and the solutions are mentioned in ReadME. ",
       "first_date": "2026-04-17",
       "forks": 0,
       "language": "C",
-      "last_date": "2026-05-30",
-      "last_harvest": "2026-05-31T08:52:39.974235+00:00",
-      "lifetime_clones": 16,
-      "lifetime_uniques": 16,
+      "last_date": "2026-06-06",
+      "last_harvest": "2026-06-07T09:21:29.304715+00:00",
+      "lifetime_clones": 18,
+      "lifetime_uniques": 18,
       "open_issues": 0,
       "stars": 0,
       "topics": [],
-      "total_clone_days": 44,
+      "total_clone_days": 51,
       "watchers": 0
     },
     "cosmocode-source/PES1UG24CS079-pes-vcs": {
       "available_months": [
-        "2026-05"
+        "2026-05",
+        "2026-06"
       ],
       "description": "Building your own version control system for file management",
       "first_date": "2026-04-17",
       "forks": 0,
       "language": "C",
-      "last_date": "2026-05-30",
-      "last_harvest": "2026-05-31T08:52:40.633432+00:00",
-      "lifetime_clones": 221,
-      "lifetime_uniques": 81,
+      "last_date": "2026-06-06",
+      "last_harvest": "2026-06-07T09:21:29.997933+00:00",
+      "lifetime_clones": 223,
+      "lifetime_uniques": 83,
       "open_issues": 0,
       "stars": 0,
       "topics": [],
-      "total_clone_days": 44,
+      "total_clone_days": 51,
       "watchers": 0
     },
     "cosmocode-source/QoS-Priority-Controller": {
       "available_months": [
-        "2026-05"
+        "2026-05",
+        "2026-06"
       ],
       "description": "This a Problem solving and learning exercise is designed by PES University to increase the understanding of how SDN works in the network layer. We use Mininet and Ryu as simulator and controller of a virtual network and test things on these tools. This project shows a priority controller for when multiple packets are being transferred over network.",
       "first_date": "2026-04-17",
       "forks": 0,
       "language": "Python",
-      "last_date": "2026-05-30",
-      "last_harvest": "2026-05-31T08:52:41.399518+00:00",
-      "lifetime_clones": 21,
-      "lifetime_uniques": 21,
+      "last_date": "2026-06-06",
+      "last_harvest": "2026-06-07T09:21:30.684811+00:00",
+      "lifetime_clones": 23,
+      "lifetime_uniques": 23,
       "open_issues": 0,
       "stars": 0,
       "topics": [],
-      "total_clone_days": 44,
+      "total_clone_days": 51,
       "watchers": 0
     },
     "cosmocode-source/Taskman-Site": {
       "available_months": [
-        "2026-05"
+        "2026-05",
+        "2026-06"
       ],
       "description": "This a second-year web development project which is made by MERN stack. It has helped in many ways and also made us gain experience and proficient in MERN stack.",
       "first_date": "2026-04-17",
       "forks": 0,
       "language": "JavaScript",
-      "last_date": "2026-05-30",
-      "last_harvest": "2026-05-31T08:52:42.075510+00:00",
+      "last_date": "2026-06-03",
+      "last_harvest": "2026-06-07T09:21:31.320108+00:00",
       "lifetime_clones": 16,
       "lifetime_uniques": 16,
       "open_issues": 0,
       "stars": 0,
       "topics": [],
-      "total_clone_days": 44,
+      "total_clone_days": 48,
       "watchers": 0
     },
     "cosmocode-source/cosmocode-source": {
       "available_months": [
-        "2026-05"
+        "2026-05",
+        "2026-06"
       ],
       "description": "",
       "first_date": "2026-04-17",
       "forks": 0,
       "language": "",
-      "last_date": "2026-05-30",
-      "last_harvest": "2026-05-31T08:52:42.705291+00:00",
-      "lifetime_clones": 855,
-      "lifetime_uniques": 470,
+      "last_date": "2026-06-06",
+      "last_harvest": "2026-06-07T09:21:32.165787+00:00",
+      "lifetime_clones": 975,
+      "lifetime_uniques": 541,
       "open_issues": 0,
       "stars": 0,
       "topics": [],
-      "total_clone_days": 44,
+      "total_clone_days": 51,
       "watchers": 0
     }
   },

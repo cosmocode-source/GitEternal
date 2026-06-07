@@ -1,0 +1,150 @@
+{
+  "checksum": "sha256:31bd5b13580ea0eb2ff8a7d92925636a64f2c723c912df29c2089d63bea77a06",
+  "clones": [
+    {
+      "count": 0,
+      "date": "2026-05-24",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-25",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-26",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-27",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-28",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-05-29",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-05-30",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-31",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-01",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-06-02",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-06-03",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-04",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-05",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-06-06",
+      "uniques": 1
+    }
+  ],
+  "month": "2026-06",
+  "referrers": [],
+  "repo": "cosmocode-source/QoS-Priority-Controller",
+  "views": [
+    {
+      "count": 0,
+      "date": "2026-05-24",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-25",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-26",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-27",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-28",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-29",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-30",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-05-31",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-01",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-02",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-03",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-04",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-05",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-06",
+      "uniques": 0
+    }
+  ]
+}
