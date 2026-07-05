@@ -1,0 +1,150 @@
+{
+  "checksum": "sha256:29e94839addc6f8ac08b8c2f2251141baed204ac3a387b2ac356fa405255cf88",
+  "clones": [
+    {
+      "count": 3,
+      "date": "2026-06-21",
+      "uniques": 3
+    },
+    {
+      "count": 0,
+      "date": "2026-06-22",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-23",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-24",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-06-25",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-06-26",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-27",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-28",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-29",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-30",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-01",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-02",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-03",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-04",
+      "uniques": 0
+    }
+  ],
+  "month": "2026-07",
+  "referrers": [],
+  "repo": "cosmocode-source/EscapeRoom-Game",
+  "views": [
+    {
+      "count": 0,
+      "date": "2026-06-21",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-22",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-23",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-24",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-25",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-26",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-27",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-28",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-29",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-30",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-01",
+      "uniques": 0
+    },
+    {
+      "count": 3,
+      "date": "2026-07-02",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-07-03",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-04",
+      "uniques": 0
+    }
+  ]
+}

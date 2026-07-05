@@ -1,0 +1,150 @@
+{
+  "checksum": "sha256:eed34c26530911cda53c3f1459dc4f7f5c8df01717cc680d92f32d13761ad530",
+  "clones": [
+    {
+      "count": 2,
+      "date": "2026-06-21",
+      "uniques": 2
+    },
+    {
+      "count": 0,
+      "date": "2026-06-22",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-23",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-06-24",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-06-25",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-26",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-27",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-06-28",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-06-29",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-30",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-01",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-02",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-03",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-07-04",
+      "uniques": 1
+    }
+  ],
+  "month": "2026-07",
+  "referrers": [],
+  "repo": "cosmocode-source/Hand-Gesture-Based-Media-Mouse-Control",
+  "views": [
+    {
+      "count": 0,
+      "date": "2026-06-21",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-22",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-23",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-24",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-25",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-26",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-27",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-28",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-29",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-06-30",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-01",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-07-02",
+      "uniques": 1
+    },
+    {
+      "count": 3,
+      "date": "2026-07-03",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-07-04",
+      "uniques": 0
+    }
+  ]
+}
