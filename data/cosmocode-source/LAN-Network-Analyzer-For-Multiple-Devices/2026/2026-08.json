@@ -1,0 +1,150 @@
+{
+  "checksum": "sha256:56acba7319b996f909812331ecad9d79c19a44955145999217ae4996835432f6",
+  "clones": [
+    {
+      "count": 0,
+      "date": "2026-07-18",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-19",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-20",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-21",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-22",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-07-23",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-07-24",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-07-25",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-07-26",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-27",
+      "uniques": 0
+    },
+    {
+      "count": 4,
+      "date": "2026-07-28",
+      "uniques": 1
+    },
+    {
+      "count": 1,
+      "date": "2026-07-29",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-07-30",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-31",
+      "uniques": 0
+    }
+  ],
+  "month": "2026-08",
+  "referrers": [],
+  "repo": "cosmocode-source/LAN-Network-Analyzer-For-Multiple-Devices",
+  "views": [
+    {
+      "count": 0,
+      "date": "2026-07-18",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-19",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-20",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-21",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-22",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-23",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-24",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-25",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-26",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-27",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-28",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-29",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-30",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-07-31",
+      "uniques": 0
+    }
+  ]
+}
