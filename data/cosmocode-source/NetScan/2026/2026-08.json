@@ -1,50 +1,10 @@
 {
-  "checksum": "sha256:cd685db674ec854302bdc74467c243c85857a851db2eea6f68ea748bec3a3ce2",
+  "checksum": "sha256:2abc623eb156a3e43bc047e3239dd19f004c95d263ac512b45b0c8e4538135af",
   "clones": [
     {
       "count": 0,
-      "date": "2026-07-18",
-      "uniques": 0
-    },
-    {
-      "count": 12,
-      "date": "2026-07-19",
-      "uniques": 8
-    },
-    {
-      "count": 0,
-      "date": "2026-07-20",
-      "uniques": 0
-    },
-    {
-      "count": 0,
-      "date": "2026-07-21",
-      "uniques": 0
-    },
-    {
-      "count": 2,
-      "date": "2026-07-22",
-      "uniques": 1
-    },
-    {
-      "count": 0,
-      "date": "2026-07-23",
-      "uniques": 0
-    },
-    {
-      "count": 3,
-      "date": "2026-07-24",
-      "uniques": 3
-    },
-    {
-      "count": 0,
-      "date": "2026-07-25",
-      "uniques": 0
-    },
-    {
-      "count": 3,
       "date": "2026-07-26",
-      "uniques": 2
+      "uniques": 0
     },
     {
       "count": 0,
@@ -57,9 +17,9 @@
       "uniques": 0
     },
     {
-      "count": 1,
+      "count": 0,
       "date": "2026-07-29",
-      "uniques": 1
+      "uniques": 0
     },
     {
       "count": 0,
@@ -72,24 +32,24 @@
       "uniques": 0
     },
     {
-      "count": 1,
+      "count": 0,
       "date": "2026-08-01",
-      "uniques": 1
+      "uniques": 0
     },
     {
-      "count": 3,
+      "count": 0,
       "date": "2026-08-02",
-      "uniques": 2
+      "uniques": 0
     },
     {
-      "count": 0,
+      "count": 17,
       "date": "2026-08-03",
-      "uniques": 0
+      "uniques": 17
     },
     {
-      "count": 0,
+      "count": 4,
       "date": "2026-08-04",
-      "uniques": 0
+      "uniques": 4
     },
     {
       "count": 0,
@@ -114,48 +74,8 @@
   ],
   "month": "2026-08",
   "referrers": [],
-  "repo": "cosmocode-source/GitEternal",
+  "repo": "cosmocode-source/NetScan",
   "views": [
-    {
-      "count": 0,
-      "date": "2026-07-18",
-      "uniques": 0
-    },
-    {
-      "count": 0,
-      "date": "2026-07-19",
-      "uniques": 0
-    },
-    {
-      "count": 0,
-      "date": "2026-07-20",
-      "uniques": 0
-    },
-    {
-      "count": 0,
-      "date": "2026-07-21",
-      "uniques": 0
-    },
-    {
-      "count": 0,
-      "date": "2026-07-22",
-      "uniques": 0
-    },
-    {
-      "count": 0,
-      "date": "2026-07-23",
-      "uniques": 0
-    },
-    {
-      "count": 0,
-      "date": "2026-07-24",
-      "uniques": 0
-    },
-    {
-      "count": 0,
-      "date": "2026-07-25",
-      "uniques": 0
-    },
     {
       "count": 0,
       "date": "2026-07-26",
@@ -197,9 +117,9 @@
       "uniques": 0
     },
     {
-      "count": 0,
+      "count": 4,
       "date": "2026-08-03",
-      "uniques": 0
+      "uniques": 1
     },
     {
       "count": 0,
