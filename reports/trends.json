@@ -1,81 +1,54 @@
 [
   {
-    "repo": "cosmocode-source/PES1UG24CS079-pes-vcs",
-    "current_week_clones": 25,
-    "prior_week_clones": 74,
-    "clone_delta_pct": -66.2,
+    "repo": "cosmocode-source/cosmocode-source",
+    "current_week_clones": 10,
+    "prior_week_clones": 41,
+    "clone_delta_pct": -75.6,
     "current_week_views": 0,
-    "prior_week_views": 48,
-    "view_delta_pct": -100.0
+    "prior_week_views": 0,
+    "view_delta_pct": null
   },
   {
     "repo": "cosmocode-source/GitEternal",
-    "current_week_clones": 13,
-    "prior_week_clones": 0,
-    "clone_delta_pct": null,
-    "current_week_views": 146,
-    "prior_week_views": 18,
-    "view_delta_pct": 711.1
-  },
-  {
-    "repo": "cosmocode-source/LAN-Network-Analyzer-For-Multiple-Devices",
-    "current_week_clones": 9,
+    "current_week_clones": 6,
     "prior_week_clones": 3,
-    "clone_delta_pct": 200.0,
-    "current_week_views": 0,
-    "prior_week_views": 3,
-    "view_delta_pct": -100.0
+    "clone_delta_pct": 100.0,
+    "current_week_views": 2,
+    "prior_week_views": 1,
+    "view_delta_pct": 100.0
   },
   {
-    "repo": "cosmocode-source/Hand-Gesture-Based-Media-Mouse-Control",
-    "current_week_clones": 5,
-    "prior_week_clones": 18,
-    "clone_delta_pct": -72.2,
+    "repo": "cosmocode-source/PES1UG24CS079-pes-vcs",
+    "current_week_clones": 2,
+    "prior_week_clones": 1,
+    "clone_delta_pct": 100.0,
     "current_week_views": 0,
-    "prior_week_views": 4,
-    "view_delta_pct": -100.0
-  },
-  {
-    "repo": "cosmocode-source/OS-Jackfruit",
-    "current_week_clones": 5,
-    "prior_week_clones": 2,
-    "clone_delta_pct": 150.0,
-    "current_week_views": 0,
-    "prior_week_views": 92,
-    "view_delta_pct": -100.0
-  },
-  {
-    "repo": "cosmocode-source/cosmocode-source",
-    "current_week_clones": 5,
-    "prior_week_clones": 55,
-    "clone_delta_pct": -90.9,
-    "current_week_views": 0,
-    "prior_week_views": 7,
-    "view_delta_pct": -100.0
-  },
-  {
-    "repo": "cosmocode-source/Network_Download_Analyzer",
-    "current_week_clones": 3,
-    "prior_week_clones": 7,
-    "clone_delta_pct": -57.1,
-    "current_week_views": 0,
-    "prior_week_views": 3,
-    "view_delta_pct": -100.0
-  },
-  {
-    "repo": "cosmocode-source/QoS-Priority-Controller",
-    "current_week_clones": 3,
-    "prior_week_clones": 3,
-    "clone_delta_pct": 0.0,
-    "current_week_views": 0,
-    "prior_week_views": 3,
-    "view_delta_pct": -100.0
+    "prior_week_views": 0,
+    "view_delta_pct": null
   },
   {
     "repo": "cosmocode-source/EscapeRoom-Game",
-    "current_week_clones": 0,
-    "prior_week_clones": 2,
-    "clone_delta_pct": -100.0,
+    "current_week_clones": 1,
+    "prior_week_clones": 1,
+    "clone_delta_pct": 0.0,
+    "current_week_views": 0,
+    "prior_week_views": 0,
+    "view_delta_pct": null
+  },
+  {
+    "repo": "cosmocode-source/Hand-Gesture-Based-Media-Mouse-Control",
+    "current_week_clones": 1,
+    "prior_week_clones": 0,
+    "clone_delta_pct": null,
+    "current_week_views": 1,
+    "prior_week_views": 0,
+    "view_delta_pct": null
+  },
+  {
+    "repo": "cosmocode-source/LAN-Network-Analyzer-For-Multiple-Devices",
+    "current_week_clones": 1,
+    "prior_week_clones": 0,
+    "clone_delta_pct": null,
     "current_week_views": 0,
     "prior_week_views": 0,
     "view_delta_pct": null
@@ -85,21 +58,30 @@
     "current_week_clones": 0,
     "prior_week_clones": 2,
     "clone_delta_pct": -100.0,
-    "current_week_views": 1,
+    "current_week_views": 4,
     "prior_week_views": 0,
     "view_delta_pct": null
   },
   {
     "repo": "cosmocode-source/KochiConnect",
     "current_week_clones": 0,
-    "prior_week_clones": 7,
-    "clone_delta_pct": -100.0,
+    "prior_week_clones": 0,
+    "clone_delta_pct": null,
     "current_week_views": 0,
     "prior_week_views": 0,
     "view_delta_pct": null
   },
   {
     "repo": "cosmocode-source/Multi-Cloud-Security-Management",
+    "current_week_clones": 0,
+    "prior_week_clones": 0,
+    "clone_delta_pct": null,
+    "current_week_views": 1,
+    "prior_week_views": 0,
+    "view_delta_pct": null
+  },
+  {
+    "repo": "cosmocode-source/NetScan",
     "current_week_clones": 0,
     "prior_week_clones": 3,
     "clone_delta_pct": -100.0,
@@ -108,12 +90,39 @@
     "view_delta_pct": -100.0
   },
   {
+    "repo": "cosmocode-source/Network_Download_Analyzer",
+    "current_week_clones": 0,
+    "prior_week_clones": 0,
+    "clone_delta_pct": null,
+    "current_week_views": 1,
+    "prior_week_views": 0,
+    "view_delta_pct": null
+  },
+  {
+    "repo": "cosmocode-source/OS-Jackfruit",
+    "current_week_clones": 0,
+    "prior_week_clones": 0,
+    "clone_delta_pct": null,
+    "current_week_views": 0,
+    "prior_week_views": 0,
+    "view_delta_pct": null
+  },
+  {
+    "repo": "cosmocode-source/QoS-Priority-Controller",
+    "current_week_clones": 0,
+    "prior_week_clones": 0,
+    "clone_delta_pct": null,
+    "current_week_views": 0,
+    "prior_week_views": 0,
+    "view_delta_pct": null
+  },
+  {
     "repo": "cosmocode-source/Taskman-Site",
     "current_week_clones": 0,
-    "prior_week_clones": 6,
-    "clone_delta_pct": -100.0,
+    "prior_week_clones": 0,
+    "clone_delta_pct": null,
     "current_week_views": 0,
-    "prior_week_views": 1,
-    "view_delta_pct": -100.0
+    "prior_week_views": 0,
+    "view_delta_pct": null
   }
 ]
