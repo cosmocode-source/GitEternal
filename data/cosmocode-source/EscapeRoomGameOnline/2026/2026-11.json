@@ -1,0 +1,150 @@
+{
+  "checksum": "sha256:4fa294182cec2e1928a2a637206960993b7c099acdb4a26b8b6046c1e22315b2",
+  "clones": [
+    {
+      "count": 0,
+      "date": "2026-10-18",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-10-19",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-10-20",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-21",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-22",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-23",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-24",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-25",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-26",
+      "uniques": 0
+    },
+    {
+      "count": 2,
+      "date": "2026-10-27",
+      "uniques": 2
+    },
+    {
+      "count": 0,
+      "date": "2026-10-28",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-29",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-30",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-31",
+      "uniques": 0
+    }
+  ],
+  "month": "2026-11",
+  "referrers": [],
+  "repo": "cosmocode-source/EscapeRoomGameOnline",
+  "views": [
+    {
+      "count": 0,
+      "date": "2026-10-18",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-19",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-20",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-21",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-22",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-23",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-24",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-25",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-26",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-27",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-28",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-29",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-30",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-10-31",
+      "uniques": 0
+    }
+  ]
+}
