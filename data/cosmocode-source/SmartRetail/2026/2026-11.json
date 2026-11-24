@@ -1,0 +1,150 @@
+{
+  "checksum": "sha256:ca02a3973bae55ead8f54c471505d28928f25d4ae942c8ee9ddf9953089a98b2",
+  "clones": [
+    {
+      "count": 0,
+      "date": "2026-11-10",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-11",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-12",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-13",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-14",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-15",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-16",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-17",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-18",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-19",
+      "uniques": 0
+    },
+    {
+      "count": 1,
+      "date": "2026-11-20",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-11-21",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-22",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-23",
+      "uniques": 0
+    }
+  ],
+  "month": "2026-11",
+  "referrers": [],
+  "repo": "cosmocode-source/SmartRetail",
+  "views": [
+    {
+      "count": 0,
+      "date": "2026-11-10",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-11",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-12",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-13",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-14",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-15",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-16",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-17",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-18",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-19",
+      "uniques": 0
+    },
+    {
+      "count": 8,
+      "date": "2026-11-20",
+      "uniques": 1
+    },
+    {
+      "count": 0,
+      "date": "2026-11-21",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-22",
+      "uniques": 0
+    },
+    {
+      "count": 0,
+      "date": "2026-11-23",
+      "uniques": 0
+    }
+  ]
+}

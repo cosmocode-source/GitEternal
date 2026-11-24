@@ -14,7 +14,10 @@
     "cosmocode-source/PES1UG24CS079-pes-vcs",
     "cosmocode-source/QoS-Priority-Controller",
     "cosmocode-source/SE-Labs-PES1UG24CS079",
+    "cosmocode-source/SmartRetail",
     "cosmocode-source/Taskman-Site",
+    "cosmocode-source/Version-Control-System-Simulation",
+    "cosmocode-source/Wifi-Floor-Classification-Study",
     "cosmocode-source/cosmocode-source"
   ]
 }
